@@ -90,6 +90,7 @@ def test_agreement_ids_become_filters_instead_of_semantic_noise(tmp_path):
     service = SearchService(Settings(index_dir=tmp_path), embedder=Embedder(), store=Store())
     service.catalog.ensure_config(service.identity())
     assert service.search("early repayment DEMO-LA-2026-001")["hits"] == []
+    assert service.search("early repayment", document_id=" demo-la-2026-001 ")["hits"] == []
 
 
 def test_stale_or_partial_documents_are_never_returned(tmp_path):

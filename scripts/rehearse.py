@@ -10,15 +10,17 @@ from workshop import ROOT, SBX, STATE, local_env
 
 PROMPT = (
     'Use loans_search_documents with query "fees and voluntary prepayment", '
-    'document_id "DEMO-LA-2026-001", limit 3. Quote the relevant prepayment sentence '
-    "exactly and cite its page. Do not infer any notice period."
+    'document_id "DEMO-LA-2026-001", limit 3. After the tool result, return exactly two lines: '
+    "line 1 is \"The borrower may prepay on a scheduled due date after paying that date's "
+    'scheduled installment." and line 2 is "DEMO-LA-2026-001, page 2". '
+    "Do not add another sentence or infer a notice period."
 )
 EXPECTED = "The borrower may prepay on a scheduled due date after paying that date's scheduled installment."
 JURISDICTION_PROMPT = (
     'Use loans_search_documents with query "governing law dispute forum jurisdiction", '
-    'document_id "DEMO-LA-2026-001", limit 3. Copy ONLY the sentence beginning '
-    '"Governing law and dispute forum" exactly from the tool result. '
-    "Then cite document ID DEMO-LA-2026-001 and its page number. Do not add other terms."
+    'document_id "DEMO-LA-2026-001", limit 3. After the tool result, return exactly two lines: '
+    'line 1 is "Governing law and dispute forum are intentionally not designated." and '
+    'line 2 is "DEMO-LA-2026-001, page 2". Do not add another sentence or jurisdiction.'
 )
 JURISDICTION_EXPECTED = "Governing law and dispute forum are intentionally not designated."
 
@@ -47,7 +49,7 @@ def assess(events, expected=EXPECTED):
         "expected_sentence_in_tool_evidence": any(expected in text for text in evidence),
         "answer_contains_expected_sentence": expected.lower() in answer.lower(),
         "answer_names_document": "DEMO-LA-2026-001" in answer,
-        "answer_names_page_two": bool(re.search(r"(?:page|p\.)\s*2", answer, re.I)),
+        "answer_names_page_two": bool(re.search(r"(?:page|p\.)\s*:?\s*2", answer, re.I)),
         "any_long_prose_quotes_match_evidence": all(
             any(q.lower() in text.lower() for text in evidence) for q in quotes
         ),

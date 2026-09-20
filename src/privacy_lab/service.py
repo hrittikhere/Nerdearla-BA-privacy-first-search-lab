@@ -89,6 +89,10 @@ class SearchService:
         if not query.strip() or len(query) > 2000 or not 1 <= limit <= 10:
             raise ValueError("Use a nonempty query up to 2000 characters and limit 1–10")
         self.verify_model()
+        if document_id is not None:
+            document_id = document_id.strip().upper()
+            if not re.fullmatch(r"DEMO-LA-\d{4}-\d{3}", document_id):
+                raise ValueError("Use a document ID like DEMO-LA-2026-001")
         # IDs occur in every page header. Use them as filters, not semantic terms.
         ids = re.findall(r"DEMO-LA-\d{4}-\d{3}", query, re.IGNORECASE)
         if document_id is None and len(set(i.upper() for i in ids)) == 1:
