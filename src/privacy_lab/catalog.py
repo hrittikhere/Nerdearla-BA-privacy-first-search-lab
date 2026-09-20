@@ -52,6 +52,10 @@ class Catalog:
             ).fetchone()
         return json.loads(row[0]) if row else None
 
+    def delete(self, document_id: str):
+        with self.connect() as db:
+            db.execute("DELETE FROM documents WHERE id=?", (document_id,))
+
     def list(
         self,
         *,

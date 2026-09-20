@@ -143,6 +143,7 @@ class SearchService:
                 raise ValueError("Document not found")
             self.catalog.put(doc, "removed")
             self.store.delete(document_id)
+            self.catalog.delete(document_id)
 
     def verify_sources(self, root: Path) -> dict:
         files = {p.name: p for p in root.rglob("*.pdf")}
