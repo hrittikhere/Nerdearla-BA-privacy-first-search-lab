@@ -64,23 +64,35 @@ reference with a single-user trust boundary, not a multi-tenant compliance platf
 
 [![Complete workflow for the privacy-first search lab, including Docker sbx, OpenCode, MCP, Ollama, Qdrant, SQLite, ingestion, retrieval, policy, and evidence flows](docs/assets/workshop-workflow.svg)](docs/assets/workshop-workflow.svg)
 
-The numbered route follows the live demonstration:
+The diagram separates the **runtime map** from two **left-to-right workflows**.
+[Open the full-size diagram](docs/assets/workshop-workflow.svg) for presentation.
 
-1. Mount the verified PDF corpus read-only into the one-shot ingestion container.
-2. Extract and chunk each page, create embeddings with local Ollama, and persist
-   passages in Qdrant plus exact metadata and repayment rows in SQLite.
-3. Send an audience question to the constrained OpenCode workshop agent.
-4. Let the small local model choose a permitted action through the dedicated Ollama
-   endpoint; no hosted provider is configured.
-5. Call one of five bounded, read-only MCP tools over the loopback HTTP endpoint.
-6. Validate arguments and retrieve semantic passages or exact structured records.
-7. Return evidence with document IDs and page numbers for local synthesis.
-8. Present the cited answer while sbx policy continues to deny unrelated egress.
+The blue indexing lane prepares the corpus:
 
-The blue border is the sbx microVM. Its private Docker daemon owns the Compose
-containers, networks, images, and volumes. The host Ollama process remains outside
-that border so it can use local hardware acceleration. Colored lines distinguish
-document movement, model calls, MCP orchestration, evidence, and denied traffic.
+1. Verify the PDF corpus and mount it read-only into the ingestion container.
+2. Extract pages, create chunks with stable citation IDs, and validate metadata
+   and repayment schedules.
+3. Call host Ollama to embed passage text with `nomic-embed-text:v1.5`.
+4. Persist vectors and passages in Qdrant; store exact fields, schedules, source
+   hashes, and ingestion state in SQLite. Structured fields bypass embedding.
+
+The purple answering lane follows a live audience question:
+
+5. Send the question to OpenCode; the small local model selects a tool and
+   OpenCode issues the MCP call.
+6. Validate the request and retrieve evidence through the five read-only MCP
+   tools. Semantic search uses local query embeddings and Qdrant; exact filters
+   and repayment schedules use SQLite.
+7. Return passages with document IDs and page numbers, or structured records,
+   through MCP to OpenCode. Repeat the tool loop as needed.
+8. OpenCode sends the evidence to the local model and displays its cited answer.
+
+The runtime map above the lanes shows the sbx microVM boundary. Its private Docker
+daemon owns the Compose containers, networks, images, and volumes. Host Ollama
+remains outside that border for local hardware acceleration. Location labels on
+the workflow cards identify where each step executes; repeated tool names refer
+to the same running services. The bottom panels show preparation and presentation
+policy separately from the data flow.
 
 ### Two data flows
 

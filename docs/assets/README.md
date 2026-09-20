@@ -12,3 +12,9 @@ published brand colors. The marks remain trademarks of their respective owners.
 When the runtime changes, update the diagram and its numbered explanation in the
 main README together. Do not add a component merely because it is common in RAG
 systems; the diagram should represent the checked-in workshop configuration.
+
+Keep runtime placement in the top map and process order in the two workflow
+lanes. Connect only adjacent cards with short arrows in the gutters. Explain
+repeated tool calls and shared services in captions instead of routing return
+arrows across cards. Keep product marks, step numbers, and text in separate areas.
+Render and inspect the entire SVG after edits, including at README display size.

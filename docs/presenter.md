@@ -20,7 +20,7 @@
 
 | Minutes | Activity | Audience takeaway |
 |---|---|---|
-| 0–5 | Follow steps 3–8 across the workflow diagram | “Local” is a property of every data hop |
+| 0–5 | Locate host Ollama and sbx in the runtime map, then follow answering steps 5–8 | “Local” is a property of every data hop |
 | 5–10 | Inspect the fictional corpus and page provenance | Evidence precedes embeddings |
 | 10–18 | Parse, chunk, inspect one chunk, explain embeddings | Chunk boundaries trade context for precision |
 | 18–25 | Semantic clause search and exact portfolio filters | Top-k search cannot establish exhaustive coverage |
