@@ -1,5 +1,10 @@
 # Presenter runbook: 60 minutes
 
+The presentation model reference is
+**[Gemma 4 E4B IT](https://huggingface.co/google/gemma-4-E4B-it)**. The existing
+runnable setup and recorded rehearsals use Llama 3.2 3B. Identify the actual
+running model when showing a live trace; see [model references](../models/README.md).
+
 ## Before the room opens
 
 - Complete `./workshop prepare` with the actual sandbox, not only `--local`.
@@ -8,7 +13,7 @@
 - Check every effective allow rule and corresponding deny evidence. No npm, PyPI,
   model downloads, or container builds should be needed during presentation.
 - Run one semantic query and one model request to warm caches. Stop unrelated
-  heavyweight inference jobs. Keep the 3B/16K configuration for the dry run.
+  heavyweight inference jobs. Keep the configured demo context bounded for the dry run.
 - Open the README's numbered end-to-end workflow diagram, an agreement PDF, and two terminals:
   the walkthrough and `sbx`/policy logs.
 - Use a large terminal font. Keep `.local/` transcripts off shared/public screens
@@ -69,14 +74,14 @@ search hits are not exhaustive over the corpus.”
 “The source text is untrusted. A sentence inside a loan agreement cannot grant
 permission to execute a command.”
 
-“We tested a small quotation task with a 3B model. That does not establish that
-every answer from it will be accurate.”
+“The model reference in the slides is Gemma 4 E4B IT. The recorded rehearsal used
+Llama 3.2 3B; those results do not establish Gemma performance or answer quality.”
 
 ## If something fails on stage
 
 | Failure | Recovery |
 |---|---|
-| Model is slow | Show the returned passages first; use the short exact-quote prompt and warmed 3B model |
+| Model is slow | Show the returned passages first; use the short exact-quote prompt and warmed local model |
 | Model invents a claim | Compare it to the evidence openly; this is a grounding failure, not a reason to hide the trace |
 | Sandbox cannot start | Explain the limitation; use the clearly labeled local path for ingestion/MCP only |
 | Compose services exited between sessions | Run `./workshop doctor`; it restores cached services before checking them |

@@ -88,10 +88,14 @@ Use an explicit agreement filter, a short semantic query, and the exact-quote
 prompt. Run `scripts/rehearse.py`. This is a deliberately narrow quality gate;
 small-model general reasoning is not guaranteed.
 
-**Memory pressure:** use the shipped 3B model and 16K context, close unrelated
+**Memory pressure:** keep the configured 16K demo context bounded, close unrelated
 model sessions, and keep the sandbox at the configured 3 GiB. Do not raise context
 to 100K+ during the dry run. Download size does not equal inference memory: KV
 cache and concurrent requests also consume RAM.
+
+The docs reference [Gemma 4 E4B IT](https://huggingface.co/google/gemma-4-E4B-it);
+the runtime still uses the existing model. See [model references](../models/README.md)
+before interpreting model names in traces or changing runtime settings.
 
 **Tensor size/load error in an old model:** `ollama show MODEL` can reveal an
 incompatible/corrupt model before inference. The initial machine's GPT-OSS weights

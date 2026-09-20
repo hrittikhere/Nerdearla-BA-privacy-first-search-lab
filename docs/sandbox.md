@@ -17,6 +17,10 @@ built-in OpenCode kit: that would inherit credentials and provider network
 permissions that this demo does not need. It declares only the host model endpoint
 and no credentials. Shared host skills are disabled when the sandbox is created.
 
+The architecture names [Gemma 4 E4B IT](https://huggingface.co/google/gemma-4-E4B-it)
+as the generation reference. This does not change the kit, endpoint, or installed
+model; [model references](../models/README.md) describes the existing runtime.
+
 ## Ports and networks
 
 | Endpoint | Who reaches it | Exposure |

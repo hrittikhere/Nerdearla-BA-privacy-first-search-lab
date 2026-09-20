@@ -16,6 +16,10 @@ OpenCode as the harness, and Docker sbx around the harness and Compose services.
 Keep a second local vector adapter behind the same retrieval contract to make
 portability concrete without complicating the primary path.
 
+The presentation uses [Gemma 4 E4B IT](https://huggingface.co/google/gemma-4-E4B-it)
+as its generation reference and `nomic-embed-text:v1.5` for embeddings. Runtime
+configuration remains separate; see [model references](../../models/README.md).
+
 Start with read-only agent tools. Administrative ingestion, source replacement,
 and reset are explicit CLI actions. Use page-local citations and deterministic
 IDs. Store corpus and generated state outside version control.

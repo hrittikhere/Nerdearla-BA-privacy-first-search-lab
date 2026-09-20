@@ -65,11 +65,11 @@ policy before showing a privacy claim.
 ./workshop demo --local
 ```
 
-This uses Llama 3.2 3B with a **16K demo context**, not GPT-OSS or another large
-model. OpenCode's general coding guidance recommends larger context windows;
-this deliberately constrained, read-only five-tool exercise is smaller. Keep
-requests short and inspect evidence. Small models can call tools correctly and
-still produce unsupported prose.
+The workshop documentation references
+[Gemma 4 E4B IT](https://huggingface.co/google/gemma-4-E4B-it). The commands above
+still use the existing Llama 3.2 3B setup with a **16K demo context**; they do not
+install Gemma. See [model references](../models/README.md). Keep requests short
+and inspect evidence: a successful tool call does not guarantee a grounded answer.
 
 Use `./workshop opencode --local` for an interactive harness, or omit `--local`
 for the sandbox. No hosted-provider API key is required for this workshop.

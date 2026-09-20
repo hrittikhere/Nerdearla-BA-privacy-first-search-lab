@@ -151,11 +151,15 @@ establish that the sbx network policy works.
 Linux and Windows/WSL have not been rehearsed here. Prepare downloads before the
 session; first-run setup time depends on your connection and cache state.
 
-| Model role | Default | Reason |
+| Model role | Reference / setting | Reason |
 |---|---|---|
-| Generation and tool selection | **Llama 3.2 3B**, local alias `privacy-lab-local` | Small model for quick, bounded tool-call rehearsals |
-| Generation context | **16,384 tokens**, up to 2,048 output tokens | Keeps the demo's memory and response budget bounded |
+| Generation and tool selection | **[Gemma 4 E4B IT](https://huggingface.co/google/gemma-4-E4B-it)** | Workshop reference for local generation and tool selection |
+| Existing demo context | **16,384 tokens**, up to 2,048 output tokens | A runtime setting, not the reference model's maximum context |
 | Embeddings | **nomic-embed-text:v1.5** | Same local model for document and query vectors |
+
+The documentation and diagram use Gemma 4 E4B IT as the generation reference.
+The executable setup remains on Llama 3.2 3B; this reference update does not
+install or rehearse Gemma. See [model references](models/README.md) for the distinction.
 
 [The Modelfile](models/Modelfile) sets the generation context and temperature zero.
 [OpenCode configuration](opencode.json) selects the local provider and workshop
@@ -477,7 +481,7 @@ small-model tuning, regression fixes, and rehearsal as focused changes.
 | Drive download fails | Download and extract the corpus under `data/source/`, then rerun preparation |
 | Partial/custom corpus detected | Inspect the source folder; the conductor expects the supplied 40 PDFs |
 | Port 11435 has cloud support enabled | Inspect the process occupying it; the workshop intentionally refuses that endpoint |
-| Model is slow or memory is pressured | Keep the shipped 3B/16K configuration, warm it first, and stop unrelated heavy inference jobs |
+| Model is slow or memory is pressured | Keep the configured demo context bounded, warm the model first, and stop unrelated heavy inference jobs |
 | Answer fails its quotation check | Inspect the actual tool evidence and trace; a tool call does not prove the answer is grounded |
 | Python cannot import the package on macOS | Use the shown `PYTHONPATH=src` commands; see the editable-package note in the operations guide |
 | Index identity differs from the model | Create a fresh index rather than mixing embedding identities |

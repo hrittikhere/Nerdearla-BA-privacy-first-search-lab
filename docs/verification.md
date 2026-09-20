@@ -4,6 +4,11 @@ This file distinguishes implementation from evidence of execution. The public
 repository must not imply that a sandbox was exercised merely because its YAML
 validated. The initial validation date is **20 September 2026**.
 
+The documentation now references
+[Gemma 4 E4B IT](https://huggingface.co/google/gemma-4-E4B-it). The execution
+evidence below remains specific to Llama 3.2 3B; no Gemma run was performed for
+the reference update. See [model references](../models/README.md).
+
 ## Environment
 
 Apple Silicon Mac, 24 GiB unified memory. Python 3.12.11, Ollama 0.32.15,

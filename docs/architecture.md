@@ -6,6 +6,13 @@ The diagram is the presentation view of the system. The sections below explain
 the ownership and security limits behind each connection. Its numbered route is
 also described in the [main workshop guide](../README.md#architecture-and-the-role-of-docker-sbx).
 
+## Model reference
+
+The diagram uses **[Gemma 4 E4B IT](https://huggingface.co/google/gemma-4-E4B-it)**
+for generation and tool selection. `nomic-embed-text:v1.5` remains the embedding
+model. This is the presentation reference; the executable setup has not been
+switched or rehearsed with Gemma. See [model references](../models/README.md).
+
 ## Two flows, one local system
 
 **Ingestion:** source PDF → page text → bounded chunks → local embedding model →
