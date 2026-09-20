@@ -2,31 +2,9 @@
 
 [![End-to-end workshop workflow with product logos, runtime boundaries, data stores, and numbered ingestion and question-answering paths](assets/workshop-workflow.svg)](assets/workshop-workflow.svg)
 
-The top map shows where each component runs; the two workflow lanes show process
-order. The same stores and host models serve both paths. Return to the
-[main workshop guide](../README.md#workflow) for setup and demo commands.
-
-## Follow the diagram
-
-The blue indexing lane prepares the corpus:
-
-1. Verify the PDF corpus and mount it read-only into the ingestion container.
-2. Extract pages, create chunks with stable citation IDs, and validate metadata
-   and repayment schedules.
-3. Call host Ollama to embed passage text with `nomic-embed-text:v1.5`.
-4. Persist vectors and passages in Qdrant; store exact fields, schedules, source
-   hashes, and ingestion state in SQLite. Structured fields bypass embedding.
-
-The purple answering lane follows a live audience question:
-
-5. Send the question to OpenCode; the small local model selects a tool and
-   OpenCode issues the MCP call.
-6. Validate the request and retrieve evidence through the five read-only MCP
-   tools. Semantic search uses local query embeddings and Qdrant; exact filters
-   and repayment schedules use SQLite.
-7. Return passages with document IDs and page numbers, or structured records,
-   through MCP to OpenCode. Repeat the tool loop as needed.
-8. OpenCode sends the evidence to the local model and displays its cited answer.
+The diagram is the presentation view of the system. The sections below explain
+the ownership and security limits behind each connection. Its numbered route is
+also described in the [main workshop guide](../README.md#architecture-and-the-role-of-docker-sbx).
 
 ## Two flows, one local system
 

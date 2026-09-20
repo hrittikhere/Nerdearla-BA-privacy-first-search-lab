@@ -13,9 +13,8 @@ The marks retain their published colors and remain trademarks of their respectiv
 owners. All vector paths are embedded locally in the diagram.
 
 When the runtime changes, update the diagram and its numbered explanation in the
-[architecture guide](../architecture.md#follow-the-diagram) together. Do not add a
-component merely because it is common in RAG systems; the diagram should represent
-the checked-in workshop configuration.
+main README together. Do not add a component merely because it is common in RAG
+systems; the diagram should represent the checked-in workshop configuration.
 
 Keep runtime placement in the top map and process order in the two workflow
 lanes. Connect only adjacent cards with short arrows in the gutters. Explain
