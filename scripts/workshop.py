@@ -19,11 +19,13 @@ SBX = "privacy-search-lab"
 OLLAMA = "http://127.0.0.1:11435"
 MODEL = "privacy-lab-local"
 EMBED = "nomic-embed-text:v1.5"
+OPENCODE_VERSION = "1.18.31"
 SOURCE = ROOT / "data/source"
 FOLDER = "https://drive.google.com/drive/folders/1hSegm8i5YgFJfEuHNIDEigXVIDf_5kjv"
 PREP_HOSTS = [
     "registry-1.docker.io",
     "auth.docker.io",
+    "production.cloudfront.docker.com",
     "production.cloudflare.docker.com",
     "*.r2.cloudflarestorage.com",
     "ghcr.io",
@@ -50,6 +52,60 @@ def get_json(url):
 def require(binary):
     if not shutil.which(binary):
         raise RuntimeError(f"Missing {binary}. See docs/quickstart.md.")
+
+
+def sbx_state():
+    """Return the authenticated local sandbox list, or fail with useful context."""
+    result = run(["sbx", "ls", "--json"], capture=True, check=False)
+    if result.returncode:
+        detail = (result.stderr or result.stdout or "unknown sbx error").strip()
+        return None, detail
+    try:
+        payload = json.loads(result.stdout)
+        sandboxes = payload["sandboxes"]
+        if not isinstance(sandboxes, list):
+            raise TypeError
+    except (json.JSONDecodeError, KeyError, TypeError) as exc:
+        raise RuntimeError("sbx returned an unexpected sandbox-list response") from exc
+    return sandboxes, ""
+
+
+def ensure_sbx_login(interactive=True):
+    """Verify Docker authentication and optionally complete the device flow."""
+    require("sbx")
+    run(["sbx", "version"])
+    sandboxes, detail = sbx_state()
+    if sandboxes is not None:
+        print("Docker sbx authentication is ready.")
+        return sandboxes
+    if "not authenticated" not in detail.lower():
+        raise RuntimeError(f"Docker sbx preflight failed: {detail}")
+    if not interactive:
+        raise RuntimeError("Docker sbx is not authenticated. Run ./workshop login in a terminal.")
+    print("Docker sbx needs authentication; starting its browser device flow.")
+    run(["sbx", "login"])
+    sandboxes, detail = sbx_state()
+    if sandboxes is None:
+        raise RuntimeError(f"Docker sbx login did not complete: {detail}")
+    print("Docker sbx login verified.")
+    return sandboxes
+
+
+def sandbox_exists(sandboxes):
+    return any(item.get("name") == SBX for item in sandboxes if isinstance(item, dict))
+
+
+def ensure_sbx_policy():
+    """Initialize Locked Down once without resetting an existing user policy."""
+    result = run(["sbx", "policy", "ls", "--json"], capture=True, check=False)
+    if result.returncode == 0:
+        print("Existing Docker sbx policy retained; preparation rules are sandbox-scoped.")
+        return
+    detail = (result.stderr or result.stdout or "unknown policy error").strip()
+    if "has not been initialized" not in detail.lower():
+        raise RuntimeError(f"Unable to inspect Docker sbx policy: {detail}")
+    run(["sbx", "policy", "init", "deny-all"])
+    print("Initialized Docker sbx with the Locked Down (deny-all) policy.")
 
 
 def local_env():
@@ -205,7 +261,7 @@ def prepare(local=False):
                 "install",
                 "--prefix",
                 ".local/opencode",
-                "opencode-ai@1.18.31",
+                f"opencode-ai@{OPENCODE_VERSION}",
                 "--no-audit",
                 "--no-fund",
             ]
@@ -213,16 +269,10 @@ def prepare(local=False):
         start_local_mcp()
         print("LOCAL DEVELOPMENT MODE: no sbx network isolation is claimed.")
         return
-    require("sbx")
-    run(["sbx", "version"])
-    run(["sbx", "ls", "--json"], capture=True)  # Fails with actionable login instructions.
+    sandboxes = ensure_sbx_login()
     # One-time initialization never resets existing policy or stops other sandboxes.
-    result = run(["sbx", "policy", "init", "deny-all"], capture=True, check=False)
-    if result.returncode:
-        print(result.stderr or result.stdout)
-        print("Existing policy will be audited before presentation; it is never reset here.")
-    marker = STATE / "sandbox-created"
-    if not marker.exists():
+    ensure_sbx_policy()
+    if not sandbox_exists(sandboxes):
         run(["sbx", "kit", "validate", "./sandbox"])
         run(
             [
@@ -240,7 +290,14 @@ def prepare(local=False):
                 str(ROOT),
             ]
         )
-        marker.write_text(SBX)
+    else:
+        print(f"Reusing existing sandbox {SBX}; sbx is the source of truth.")
+    docker_socket = sandbox_exec(["test", "-S", "/var/run/docker.sock"], check=False)
+    if docker_socket.returncode:
+        raise RuntimeError(
+            "The existing sandbox has no private Docker socket. Remove only "
+            f"{SBX} with 'sbx rm {SBX}', then rerun ./workshop prepare."
+        )
     enabled = []
     try:
         for host in PREP_HOSTS:
@@ -250,6 +307,18 @@ def prepare(local=False):
         sandbox_exec(["docker", "compose", "pull", "qdrant"])
         sandbox_exec(["docker", "compose", "up", "-d", "--wait"])
         sandbox_exec(["docker", "compose", "run", "--rm", "ingest"])
+        current_opencode = sandbox_exec(["opencode", "--version"], capture=True)
+        if current_opencode.stdout.strip() != OPENCODE_VERSION:
+            sandbox_exec(
+                [
+                    "npm",
+                    "install",
+                    "--global",
+                    f"opencode-ai@{OPENCODE_VERSION}",
+                    "--no-audit",
+                    "--no-fund",
+                ]
+            )
         # Resolve provider packages before closing preparation egress.
         sandbox_exec(["opencode", "models", "ollama"])
     finally:
@@ -265,6 +334,10 @@ def doctor(local=False):
     status = get_json(OLLAMA + "/api/status")
     if status.get("cloud", {}).get("disabled") is not True:
         raise RuntimeError("Workshop Ollama cloud-disable check failed")
+    if not local:
+        # A sandbox VM or its private Docker daemon can restart between rehearsal
+        # sessions. Restore the cached services before checking their state.
+        sandbox_exec(["docker", "compose", "up", "-d", "--wait"])
     result = lab(["status"], local, capture=True)
     data = json.loads(result.stdout)
     print(json.dumps(data, indent=2))
@@ -300,6 +373,7 @@ def privacy_check(local=False):
     for target, expected in [
         ("localhost:11435", "Allowed:"),
         ("example.com:443", "Denied:"),
+        ("example.com:80", "Denied:"),
         ("api.openai.com:443", "Denied:"),
         ("registry.npmjs.org:443", "Denied:"),
     ]:
@@ -314,7 +388,9 @@ def privacy_check(local=False):
     sandbox_exec(
         ["curl", "--fail", "--max-time", "10", "http://host.docker.internal:11435/api/status"]
     )
-    probe = "import urllib.request; urllib.request.urlopen('https://example.com', timeout=10)"
+    # Plain HTTP makes the policy denial visible without depending on whether the
+    # application container trusts the sandbox proxy's generated TLS certificate.
+    probe = "import urllib.request; urllib.request.urlopen('http://example.com', timeout=10)"
     # A failed request is necessary, but policy evidence above and logs below are also required.
     agent = sandbox_exec(["curl", "--fail", "--max-time", "10", "https://example.com"], check=False)
     container = sandbox_exec(
@@ -415,6 +491,7 @@ def main():
     parser.add_argument(
         "command",
         choices=[
+            "login",
             "models-start",
             "models-prepare",
             "fetch",
@@ -438,7 +515,12 @@ def main():
     args = parser.parse_args()
     STATE.mkdir(exist_ok=True)
     try:
-        if args.command == "models-start":
+        if args.command == "login":
+            if args.local:
+                raise RuntimeError("The login command is only for the Docker sbx path")
+            ensure_sbx_login()
+            run(["sbx", "diagnose"])
+        elif args.command == "models-start":
             models_start()
         elif args.command == "models-prepare":
             models_prepare()

@@ -3,7 +3,9 @@ kind: sandbox
 name: privacy-search-lab
 description: Local document retrieval with OpenCode and no cloud credentials
 sandbox:
-  image: docker/sandbox-templates:opencode@sha256:88a078fc021d0a2b4c3315f21a6f05dfdda5a6b30369a53d185b5b6544465efc
+  # The -docker template is required for the private Docker daemon/socket used
+  # by Compose inside the microVM. The plain opencode image has only the CLI.
+  image: docker/sandbox-templates:opencode-docker@sha256:d23d51e1eaa7c23db723b3cd547fc998829b5c147579c512c7222efd30761fdd
   entrypoint: [opencode]
 environment:
   variables:
