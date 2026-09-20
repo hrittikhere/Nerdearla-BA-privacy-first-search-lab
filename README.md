@@ -57,10 +57,10 @@ reference with a single-user trust boundary, not a multi-tenant compliance platf
 
 ## Architecture and the role of Docker sbx
 
-[![Complete workflow for the privacy-first search lab, including Docker sbx, OpenCode, MCP, Ollama, Qdrant, SQLite, ingestion, retrieval, policy, and evidence flows](docs/assets/workshop-workflow.svg)](docs/assets/workshop-workflow.svg)
+[![Complete workflow for the privacy-first search lab, including Docker sbx, OpenCode, MCP, Ollama, Qdrant, SQLite, ingestion, retrieval, policy, and evidence flows](docs/assets/workshop-workflow-gemma4.svg)](docs/assets/workshop-workflow-gemma4.svg)
 
 The diagram separates the **runtime map** from two **left-to-right workflows**.
-[Open the full-size diagram](docs/assets/workshop-workflow.svg) for presentation.
+[Open the full-size diagram](docs/assets/workshop-workflow-gemma4.svg) for presentation.
 
 The blue indexing lane prepares the corpus:
 

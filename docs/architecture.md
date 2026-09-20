@@ -1,6 +1,6 @@
 # Architecture and trust boundaries
 
-[![End-to-end workshop workflow with product logos, runtime boundaries, data stores, and numbered ingestion and question-answering paths](assets/workshop-workflow.svg)](assets/workshop-workflow.svg)
+[![End-to-end workshop workflow with product logos, runtime boundaries, data stores, and numbered ingestion and question-answering paths](assets/workshop-workflow-gemma4.svg)](assets/workshop-workflow-gemma4.svg)
 
 The diagram is the presentation view of the system. The sections below explain
 the ownership and security limits behind each connection. Its numbered route is

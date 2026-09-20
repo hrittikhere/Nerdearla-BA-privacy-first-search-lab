@@ -1,6 +1,6 @@
 # Diagram assets
 
-`workshop-workflow.svg` is the source and delivery format for the workshop's
+`workshop-workflow-gemma4.svg` is the source and delivery format for the workshop's
 end-to-end diagram. It is self-contained, scales for projection, has an accessible
 title and description, and does not fetch remote assets when GitHub renders it.
 
