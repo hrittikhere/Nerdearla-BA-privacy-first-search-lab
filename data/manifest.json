@@ -1,0 +1,289 @@
+{
+  "corpus": "40 fictional loan agreements",
+  "expected_documents": 40,
+  "expected_pages": 178,
+  "expected_chunks": 481,
+  "expected_schedule_rows": 1744,
+  "files": [
+    {
+      "document_id": "DEMO-LA-2026-001",
+      "source": "01_household_lena_rowan.pdf",
+      "sha256": "de53e50e7c22c1f2407410574cfe48d1aa9f564824a34fea3c68e3bf893e209f",
+      "pages": 4,
+      "chunks": 10
+    },
+    {
+      "document_id": "DEMO-LA-2026-002",
+      "source": "02_household_omar_finch.pdf",
+      "sha256": "9f597fe7e46f3cafef25fbc5ac2c59be63b6cfdede43e9725e3642c7e3033b72",
+      "pages": 4,
+      "chunks": 10
+    },
+    {
+      "document_id": "DEMO-LA-2026-003",
+      "source": "03_household_mira_solen.pdf",
+      "sha256": "475c2f1c1aa301e78c73929d54993a9bb4f287e327fe1f847ee39e1246e795ad",
+      "pages": 4,
+      "chunks": 11
+    },
+    {
+      "document_id": "DEMO-LA-2026-004",
+      "source": "04_household_theo_arden.pdf",
+      "sha256": "9a060f728cb99279e89eb8fe29b0debead9cf93b415cae25fadbbd829156d5c5",
+      "pages": 5,
+      "chunks": 12
+    },
+    {
+      "document_id": "DEMO-LA-2026-005",
+      "source": "05_household_priya_lark.pdf",
+      "sha256": "3b40a1cf7818d1eef5bebfe3bdfd02dc393b663b6c9de1693d7fe06a264bba96",
+      "pages": 5,
+      "chunks": 13
+    },
+    {
+      "document_id": "DEMO-LA-2026-006",
+      "source": "06_household_daniel_quill.pdf",
+      "sha256": "433fef0b1ff37299ae4df976abc20b114caa566797b6a6e3d7a9ce04a6eab065",
+      "pages": 6,
+      "chunks": 15
+    },
+    {
+      "document_id": "DEMO-LA-2026-007",
+      "source": "07_household_hana_brindle.pdf",
+      "sha256": "e032645c388b5d64f21a273acf2112d5eead30f3cc80e6666b023f740c18786e",
+      "pages": 6,
+      "chunks": 17
+    },
+    {
+      "document_id": "DEMO-LA-2026-008",
+      "source": "08_household_julian_vale.pdf",
+      "sha256": "6b28c617e30d0418e1564019cca39c1b5664ec51f9c631533194310f52f39ba3",
+      "pages": 6,
+      "chunks": 17
+    },
+    {
+      "document_id": "DEMO-LA-2026-009",
+      "source": "09_microbusiness_reed_bicycle_repair_demo.pdf",
+      "sha256": "5f2b51aaa3a73ace29bae244f5e54304b3a4ff6420e7e4f3947d37d7d2d4d43e",
+      "pages": 4,
+      "chunks": 10
+    },
+    {
+      "document_id": "DEMO-LA-2026-010",
+      "source": "10_microbusiness_violet_stitch_studio_demo.pdf",
+      "sha256": "a6e679635b749060af9941ca62933da1023f1aef4d52d61a872db01e48fecec3",
+      "pages": 4,
+      "chunks": 10
+    },
+    {
+      "document_id": "DEMO-LA-2026-011",
+      "source": "11_microbusiness_rowan_street_coffee_cart_demo.pdf",
+      "sha256": "ee572e90bbc5de0850ea87fdb4ddcc60db19386eae56ad18342a0bde7be33bbc",
+      "pages": 4,
+      "chunks": 10
+    },
+    {
+      "document_id": "DEMO-LA-2026-012",
+      "source": "12_microbusiness_north_orchard_produce_demo.pdf",
+      "sha256": "3714c15dec127caf93b279c76c626d26cd0fa352733a45a44a33d6d40a38daf8",
+      "pages": 4,
+      "chunks": 11
+    },
+    {
+      "document_id": "DEMO-LA-2026-013",
+      "source": "13_microbusiness_juniper_mobile_tech_demo_ltd.pdf",
+      "sha256": "52c8273c8361b18fd83b3de6e92093e00c2fd7481be801f2f2a99fe6fbfaa2ea",
+      "pages": 4,
+      "chunks": 11
+    },
+    {
+      "document_id": "DEMO-LA-2026-014",
+      "source": "14_microbusiness_willow_corner_bakery_demo_ltd.pdf",
+      "sha256": "d4e4eeda167abd776e17eb46da28ee7f235c19509e26c725a5ce0054122521d9",
+      "pages": 5,
+      "chunks": 12
+    },
+    {
+      "document_id": "DEMO-LA-2026-015",
+      "source": "15_microbusiness_pebble_care_cleaning_demo_ltd.pdf",
+      "sha256": "dd1ba37466a1648192c69ca8ab740ea61367bd700d3742738f94e77bcf9594bf",
+      "pages": 5,
+      "chunks": 12
+    },
+    {
+      "document_id": "DEMO-LA-2026-016",
+      "source": "16_microbusiness_elm_workshop_furniture_demo_ltd.pdf",
+      "sha256": "7c297390ac7e5901ca8797f2f3a0dec2972feef2105110012456464f3835a47d",
+      "pages": 5,
+      "chunks": 13
+    },
+    {
+      "document_id": "DEMO-LA-2026-017",
+      "source": "17_small_business_alder_retail_demo_ltd.pdf",
+      "sha256": "91eadcac90fa4b4ea50cc10226214fac7e399636a0622da3d31a4f51425ce65d",
+      "pages": 4,
+      "chunks": 11
+    },
+    {
+      "document_id": "DEMO-LA-2026-018",
+      "source": "18_small_business_clover_catering_demo_ltd.pdf",
+      "sha256": "260ec233a209ca71009b135b350c3f8559f4551bb07b1ee5728ca6255d37c4fb",
+      "pages": 5,
+      "chunks": 12
+    },
+    {
+      "document_id": "DEMO-LA-2026-019",
+      "source": "19_small_business_copper_trail_logistics_demo_ltd.pdf",
+      "sha256": "a0339b27dd63be12d744d2c1d975fe59754892d8a2996094a144954c137f46e6",
+      "pages": 5,
+      "chunks": 13
+    },
+    {
+      "document_id": "DEMO-LA-2026-020",
+      "source": "20_small_business_brightfen_packaging_demo_ltd.pdf",
+      "sha256": "6eaeb69411f18ba173782812822cb18c7e83eb7be0bc8f05e165f6797fd9107d",
+      "pages": 5,
+      "chunks": 13
+    },
+    {
+      "document_id": "DEMO-LA-2026-021",
+      "source": "21_small_business_acorn_cloud_services_demo_ltd.pdf",
+      "sha256": "70152815b12b0d1190a00f131af62867f95445732782b241af7321d009b63b84",
+      "pages": 5,
+      "chunks": 12
+    },
+    {
+      "document_id": "DEMO-LA-2026-022",
+      "source": "22_small_business_meadowline_foods_demo_ltd.pdf",
+      "sha256": "1c28c7df97b1b5100c7f6bcc14860572953ab3a0d6e7c902910c05060b5d04ff",
+      "pages": 5,
+      "chunks": 13
+    },
+    {
+      "document_id": "DEMO-LA-2026-023",
+      "source": "23_small_business_summit_loom_textiles_demo_ltd.pdf",
+      "sha256": "4b70bc67288422cc8f9bbba90b240098fb53835236ad919f3f3340314940e496",
+      "pages": 5,
+      "chunks": 14
+    },
+    {
+      "document_id": "DEMO-LA-2026-024",
+      "source": "24_small_business_silverbrook_dental_labs_demo_ltd.pdf",
+      "sha256": "0737dca634e29e39261001337123a8f83d5a5dc5865ad8471df8f1b4c3193a4a",
+      "pages": 5,
+      "chunks": 14
+    },
+    {
+      "document_id": "DEMO-LA-2026-025",
+      "source": "25_midsize_business_cedarspan_engineering_demo_ltd.pdf",
+      "sha256": "12eec7b22635952000f3177ca98f9bb595c6c458c3aa49315d9c53fc3190ae03",
+      "pages": 4,
+      "chunks": 11
+    },
+    {
+      "document_id": "DEMO-LA-2026-026",
+      "source": "26_midsize_business_sunfield_components_demo_ltd.pdf",
+      "sha256": "dda0391e4a3bcb9b366fac9378a687bf85455cdabf1f0ddbde42199afffda995",
+      "pages": 4,
+      "chunks": 11
+    },
+    {
+      "document_id": "DEMO-LA-2026-027",
+      "source": "27_midsize_business_northmere_cold_chain_demo_ltd.pdf",
+      "sha256": "be43970073655361ddee71176f538c5060a51be3f30c2eaaa338024d185b1211",
+      "pages": 4,
+      "chunks": 11
+    },
+    {
+      "document_id": "DEMO-LA-2026-028",
+      "source": "28_midsize_business_bluefen_digital_systems_demo_ltd.pdf",
+      "sha256": "a975ae88a6c7f7e2db50f1b3fd2e339392200a8aace4e09e0b91e54be1b0dac7",
+      "pages": 4,
+      "chunks": 11
+    },
+    {
+      "document_id": "DEMO-LA-2026-029",
+      "source": "29_midsize_business_riverforge_materials_demo_ltd.pdf",
+      "sha256": "58f0b7281c7aabcef186139e7ca3a5460a6049967e9d11e4b565323ece6e2f3c",
+      "pages": 4,
+      "chunks": 11
+    },
+    {
+      "document_id": "DEMO-LA-2026-030",
+      "source": "30_midsize_business_orchardstone_hospitality_demo_ltd.pdf",
+      "sha256": "d912283df10afd069a501929e314430e12dc312968eb82c9523e4ca4c7c37815",
+      "pages": 4,
+      "chunks": 12
+    },
+    {
+      "document_id": "DEMO-LA-2026-031",
+      "source": "31_midsize_business_windharbor_renewables_demo_ltd.pdf",
+      "sha256": "c138d69da9b402d0c0d4e272a2db6a6b724ad550d78727974eafecc4c0e9c504",
+      "pages": 4,
+      "chunks": 12
+    },
+    {
+      "document_id": "DEMO-LA-2026-032",
+      "source": "32_midsize_business_redfern_distribution_demo_ltd.pdf",
+      "sha256": "b3b817a4aa39bd9687de784a7e3b134885629f33359b734e2f52dc900f9dcdec",
+      "pages": 4,
+      "chunks": 12
+    },
+    {
+      "document_id": "DEMO-LA-2026-033",
+      "source": "33_corporation_meridian_arc_manufacturing_demo_corp.pdf",
+      "sha256": "a1e3dcef003964a005cc2c607667a278ffbb0d7aa7d135507c31eaef54a063d2",
+      "pages": 4,
+      "chunks": 11
+    },
+    {
+      "document_id": "DEMO-LA-2026-034",
+      "source": "34_corporation_bluepeak_networks_demo_corp.pdf",
+      "sha256": "a3513e77ce4a230262cac3b9fce2b33daf01866c8c5005e3021308ddf45e13d7",
+      "pages": 4,
+      "chunks": 11
+    },
+    {
+      "document_id": "DEMO-LA-2026-035",
+      "source": "35_corporation_atlas_meadow_industrials_demo_corp.pdf",
+      "sha256": "0b655214331ab8c370056cea423d0214776a2e5a63192f16fb1b37df4912a897",
+      "pages": 4,
+      "chunks": 12
+    },
+    {
+      "document_id": "DEMO-LA-2026-036",
+      "source": "36_corporation_continental_grove_logistics_demo_corp.pdf",
+      "sha256": "41103e5d1bdb77b0e31ab869eab1dc80a4c5900ce4dab14962a65b649ee8b27d",
+      "pages": 4,
+      "chunks": 12
+    },
+    {
+      "document_id": "DEMO-LA-2026-037",
+      "source": "37_corporation_terra_vista_infrastructure_demo_corp.pdf",
+      "sha256": "d32f3d6c84b9b6b15010e55514d90a9dd2b19e5f67a0f984953c33e31fd18e6e",
+      "pages": 4,
+      "chunks": 12
+    },
+    {
+      "document_id": "DEMO-LA-2026-038",
+      "source": "38_corporation_horizon_glass_energy_demo_corp.pdf",
+      "sha256": "46f8f98eaaf3bc52f0fa86928b09e980da7f80ec40c1a6dcce22c1ceb1ea41ef",
+      "pages": 4,
+      "chunks": 12
+    },
+    {
+      "document_id": "DEMO-LA-2026-039",
+      "source": "39_corporation_summit_harbor_holdings_demo_corp.pdf",
+      "sha256": "1903c83b6f7e7dcc569895d48894c4f10e97aa09fc89307307e8c25b81814f93",
+      "pages": 4,
+      "chunks": 12
+    },
+    {
+      "document_id": "DEMO-LA-2026-040",
+      "source": "40_corporation_nova_crest_global_demo_corp.pdf",
+      "sha256": "c44646b57a5ebdae0e75914a2bf7c06eb0b2e867b2f7a228cda0537f40414238",
+      "pages": 4,
+      "chunks": 12
+    }
+  ]
+}

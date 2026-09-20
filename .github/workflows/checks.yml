@@ -1,0 +1,32 @@
+name: Code and protocol checks
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.8.22"
+          enable-cache: true
+      - run: uv sync --frozen --group dev
+      - run: uv run ruff check src scripts tests
+      - run: uv run ruff format --check src scripts tests
+      - run: uv run pytest -q
+        env:
+          PYTHONPATH: src
+      - run: docker compose config --quiet
+      - name: Ensure generated data is not tracked
+        run: |
+          python3 - <<'PY'
+          import subprocess
+          files = subprocess.check_output(['git', 'ls-files'], text=True).splitlines()
+          forbidden = [p for p in files if p.startswith(('.local/', 'data/index/', 'reports/'))
+                       or (p.startswith('data/source/') and p != 'data/source/.gitkeep')
+                       or p.endswith(('.pdf', '.sqlite', '.env'))]
+          assert not forbidden, forbidden
+          PY
