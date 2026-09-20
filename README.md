@@ -1,5 +1,7 @@
 # Privacy First Search Lab
 
+[![Code and protocol checks](https://github.com/rudrakshkarpe/Nerdearla-BA-privacy-first-search-lab/actions/workflows/checks.yml/badge.svg)](https://github.com/rudrakshkarpe/Nerdearla-BA-privacy-first-search-lab/actions/workflows/checks.yml)
+
 **Build a local document-search pipeline, expose it through MCP, and watch a small local model use it from OpenCode.**
 
 A hands-on workshop for **[Nerdearla Argentina 2026](https://nerdearla.com/en/argentina/2026/)**,
@@ -14,8 +16,6 @@ and an agent's answer. The main architecture runs OpenCode and the search servic
 inside Docker sbx, with a dedicated local Ollama process providing inference on the
 host. A lighter local mode lets you rehearse the same retrieval and MCP workflow
 without creating a sandbox.
-
-[![Code and protocol checks](https://github.com/rudrakshkarpe/Nerdearla-BA-privacy-first-search-lab/actions/workflows/checks.yml/badge.svg)](https://github.com/rudrakshkarpe/Nerdearla-BA-privacy-first-search-lab/actions/workflows/checks.yml)
 
 ## Contents
 
