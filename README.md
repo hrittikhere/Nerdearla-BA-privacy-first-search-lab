@@ -3,8 +3,10 @@
 **Build a local document-search pipeline, expose it through MCP, and watch a small local model use it from OpenCode.**
 
 A hands-on workshop for **[Nerdearla Argentina 2026](https://nerdearla.com/en/argentina/2026/)**,
-accompanying *Building Privacy-First Vector Search Pipelines With Local LLMs*
-by [Rudraksh Karpe](https://github.com/rudrakshkarpe).
+accompanying *Building Privacy-First Vector Search Pipelines With Local LLMs*.
+
+Lab by [Rudraksh Karpe](https://github.com/rudrakshkarpe) and
+[Hrittik Roy](https://github.com/hrittikhere).
 
 Follow a document from PDF extraction to embeddings, vector search, cited evidence,
 and an agent's answer. The main architecture runs OpenCode and the search services
