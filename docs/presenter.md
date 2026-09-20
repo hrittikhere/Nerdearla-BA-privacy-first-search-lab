@@ -3,6 +3,7 @@
 ## Before the room opens
 
 - Complete `./workshop prepare` with the actual sandbox, not only `--local`.
+- Run `./workshop login` first if the Docker device session may have expired.
 - Run `./workshop doctor`, `./workshop privacy-check`, and the small-model rehearsal.
 - Check every effective allow rule and corresponding deny evidence. No npm, PyPI,
   model downloads, or container builds should be needed during presentation.
@@ -78,6 +79,8 @@ every answer from it will be accurate.”
 | Model is slow | Show the returned passages first; use the short exact-quote prompt and warmed 3B model |
 | Model invents a claim | Compare it to the evidence openly; this is a grounding failure, not a reason to hide the trace |
 | Sandbox cannot start | Explain the limitation; use the clearly labeled local path for ingestion/MCP only |
+| Compose services exited between sessions | Run `./workshop doctor`; it restores cached services before checking them |
+| Harness prints a tool call as text | Rerun `./workshop prepare` to restore the pinned OpenCode version and provider cache |
 | External access succeeds | Stop the privacy claim and inspect effective allow rules |
 | Retrieval finds the wrong page | Narrow by agreement ID and inspect the query; do not treat a score as confidence |
 | Service fails | Use the health and logs commands in the operations guide, then resume the failed step |

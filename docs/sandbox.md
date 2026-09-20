@@ -9,11 +9,13 @@
 3. **Compose inside sbx:** the microVM's own Docker daemon runs Qdrant and the
    search service. The host Docker socket is never mounted.
 
-The custom [kit](../sandbox/spec.yaml) uses Docker's official OpenCode image,
-pinned by multi-platform digest. It does **not** extend the built-in OpenCode kit:
-that would inherit credentials and provider network permissions that this demo
-does not need. It declares only the host model endpoint and no credentials.
-Shared host skills are disabled when the sandbox is created.
+The custom [kit](../sandbox/spec.yaml) uses Docker's official Docker-enabled
+OpenCode image, pinned by multi-platform digest. The `opencode-docker` variant is
+required for the private `/var/run/docker.sock`; the plain `opencode` template
+contains the CLI without that daemon socket. The kit does **not** extend the
+built-in OpenCode kit: that would inherit credentials and provider network
+permissions that this demo does not need. It declares only the host model endpoint
+and no credentials. Shared host skills are disabled when the sandbox is created.
 
 ## Ports and networks
 
@@ -41,6 +43,10 @@ stateDiagram-v2
     Verify --> Diagnose: any check fails
     Diagnose --> Prepare: explicit repair
 ```
+
+Run `./workshop login` before preparation. It performs the browser device flow
+only when required, verifies the resulting session, and runs Docker's diagnostic
+checks. `./workshop prepare` performs the same authentication preflight.
 
 The helper initializes `deny-all` only if policy has never been initialized. It
 does not call `sbx policy reset`, which would affect unrelated sandboxes. Existing

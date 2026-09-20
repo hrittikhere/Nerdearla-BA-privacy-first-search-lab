@@ -55,9 +55,24 @@ the sandbox's MCP server is healthy.
 
 ## Common failures
 
-**Not authenticated to Docker:** run `sbx login` and complete the browser flow.
+**Not authenticated to Docker:** run `./workshop login` and complete the browser
+device flow. The command verifies the resulting session and runs `sbx diagnose`.
 `docker login` and Docker Desktop sign-in do not necessarily authenticate sbx.
 The kit can validate without authentication; sandbox creation cannot.
+
+**`/var/run/docker.sock` is missing inside sbx:** the plain OpenCode template has
+the Docker CLI but no private daemon socket. The current kit pins the
+`opencode-docker` template. Remove only the outdated `privacy-search-lab` sandbox,
+then rerun preparation; this also removes that sandbox's service volumes.
+
+**Docker Hub redirects return 403 during preparation:** current Docker Hub layers
+can be served through `production.cloudfront.docker.com`. Preparation adds that
+sandbox-scoped rule temporarily and removes it in `finally`. Rerun preparation;
+do not add a permanent broad registry allowance.
+
+**OpenCode prints malformed JSON instead of calling MCP:** the base template may
+ship a different OpenCode release. Preparation pins 1.18.31 inside the sandbox
+and warms the Ollama provider package before closing preparation egress.
 
 **Global policy is Balanced/Open:** the preparation script does not reset your
 global policy. Inspect `sbx policy ls privacy-search-lab --wide`. Configure the

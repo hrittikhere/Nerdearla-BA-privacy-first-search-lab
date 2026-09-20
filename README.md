@@ -17,10 +17,9 @@ without creating a sandbox.
 [![Code and protocol checks](https://github.com/rudrakshkarpe/Nerdearla-BA-privacy-first-search-lab/actions/workflows/checks.yml/badge.svg)](https://github.com/rudrakshkarpe/Nerdearla-BA-privacy-first-search-lab/actions/workflows/checks.yml)
 
 **Verification status:** local ingestion, SQLite retrieval, containerized Qdrant,
-HTTP MCP, and both small-model quotation rehearsals have passed. The sbx kit
-validates, but actual sandbox creation, egress enforcement, and the complete
-sandbox rehearsal remain pending Docker sign-in. Read the
-[verification record](docs/verification.md) before calling the isolation demo stage-ready.
+HTTP MCP, Docker sbx creation, sandbox-scoped egress checks, and both small-model
+quotation rehearsals have passed on the reference machine. Read the
+[verification record](docs/verification.md) for the executed checks and limits.
 
 ## Contents
 
@@ -129,7 +128,7 @@ Read the [architecture](docs/architecture.md), [sbx guide](docs/sandbox.md), and
 |---|---|---|---|
 | `./workshop prepare --local` | SQLite catalog and SQLite cosine scan | Fast ingestion, retrieval, MCP, and OpenCode rehearsal on the host | Verified with the full corpus and small model |
 | Standalone Docker Compose | Qdrant plus SQLite catalog in service volumes | Container packaging, Qdrant, and HTTP MCP on Docker Desktop | Verified; see [commands](docs/operations.md#standalone-container-validation) |
-| `./workshop prepare` | Qdrant plus SQLite catalog inside sbx | Intended workshop architecture with microVM and egress policy | Kit validated; actual sbx rehearsal pending |
+| `./workshop prepare` | Qdrant plus SQLite catalog inside sbx | Intended workshop architecture with microVM and egress policy | Verified with sbx 0.43.0, the full corpus, MCP, and small model |
 
 All modes share the same parser, retrieval service, and MCP tool contract. Local
 mode has no sandbox containment. Running Compose on Docker Desktop also does not
@@ -142,7 +141,7 @@ establish that the sbx network policy works.
 | Host | Initial validation used an Apple Silicon Mac with 24 GiB unified memory; this is an observed environment, not a tested minimum |
 | Common tools | Git, Python 3.11–3.13, `uv`, and Ollama |
 | Local mode | Node/npm; preparation installs OpenCode 1.18.31 under `.local/` |
-| Sandbox mode | Docker Sandboxes CLI and Docker account sign-in; kit validated with sbx 0.43.0 |
+| Sandbox mode | Docker Sandboxes CLI and Docker account sign-in; verified with sbx 0.43.0 |
 | Standalone containers | Docker Desktop with Compose |
 | Preparation | Internet access and disk space for PDFs, packages, images, and model files |
 
@@ -195,7 +194,7 @@ On macOS, install sbx if needed and complete its browser sign-in:
 ```bash
 brew tap docker/tap
 brew install docker/tap/sbx
-sbx login
+./workshop login
 ```
 
 Then prepare and verify the sandbox:
@@ -207,11 +206,14 @@ Then prepare and verify the sandbox:
 ./workshop demo
 ```
 
-The script creates `privacy-search-lab` with 3 GiB memory and four CPUs, builds the
-service image, starts Compose, and ingests the corpus. It does not reset an
-existing global sandbox policy. `privacy-check` must verify the effective rules,
-local inference access, and blocked external requests from the agent environment
-and service container before you claim network isolation.
+`./workshop login` starts Docker's browser device flow when needed, verifies the
+result with `sbx ls`, and runs `sbx diagnose`. `prepare` performs the same login
+check and reuses an existing named sandbox when present. It creates
+`privacy-search-lab` with 3 GiB memory and four CPUs, pins OpenCode 1.18.31 inside
+the sandbox, builds the service image, starts Compose, and ingests the corpus.
+It does not reset an existing global sandbox policy. `privacy-check` verifies the
+effective rules, local inference access, blocked external requests from both the
+agent and service container, retrieval after the denial, and the policy log.
 
 ### Endpoints and local state
 
@@ -402,7 +404,7 @@ the [audience exercises](docs/exercises.md) extend each stage.
 | Concern | Implemented control or boundary |
 |---|---|
 | Hosted inference | Dedicated cloud-disabled Ollama process and local model/provider configuration |
-| Outbound access | sbx policy configuration, conservative allowlist audit, local-access and external-egress probes; actual sbx execution remains pending |
+| Outbound access | Verified sbx allowlist audit, local-access probes, external denials from the agent and service container, and policy-log evidence |
 | Database exposure | Qdrant has no published host port; MCP is published to loopback |
 | Agent capabilities | Five retrieval tools; administrative changes remain explicit CLI operations |
 | Instructions inside PDFs | Treat source text and tool results as untrusted evidence; their contents cannot grant tool permissions |
@@ -423,9 +425,9 @@ automatic compliance decisions. See [security and scope](SECURITY.md).
 ## Verification and development
 
 The [verification record](docs/verification.md) separates executed checks from
-pending work. The recorded baseline includes **21 automated tests**, all 40 PDFs,
-six corpus acceptance checks on both backends, real MCP handshakes, and two
-successful small-model quotation rehearsals.
+their limits. The recorded baseline includes **24 automated tests**, all 40 PDFs,
+six corpus acceptance checks on both backends, real MCP handshakes, actual sbx
+policy probes, and two successful small-model quotation rehearsals in the sandbox.
 
 Run code and protocol checks without downloading the corpus or models:
 
@@ -465,7 +467,10 @@ small-model tuning, regression fixes, and rehearsal as focused changes.
 
 | Symptom | First action |
 |---|---|
-| `Not authenticated to Docker` | Run `sbx login`; Docker Desktop sign-in alone may not authenticate sbx |
+| `Not authenticated to Docker` | Run `./workshop login`; Docker Desktop sign-in alone may not authenticate sbx |
+| Compose cannot find `/var/run/docker.sock` | Remove an old workshop sandbox and rerun preparation; current kits use the pinned `opencode-docker` template |
+| Docker Hub layer returns `403` | Rerun `./workshop prepare`; it temporarily permits the observed CloudFront registry redirect and removes the rule afterward |
+| OpenCode prints a tool call instead of invoking it | Rerun preparation so the sandbox installs the verified OpenCode 1.18.31 build |
 | Drive download fails | Download and extract the corpus under `data/source/`, then rerun preparation |
 | Partial/custom corpus detected | Inspect the source folder; the conductor expects the supplied 40 PDFs |
 | Port 11435 has cloud support enabled | Inspect the process occupying it; the workshop intentionally refuses that endpoint |
@@ -521,7 +526,7 @@ Nerdearla-BA-privacy-first-search-lab/
 | [Exercises](docs/exercises.md) | Work through attendee experiments |
 | [Presenter runbook](docs/presenter.md) | Deliver the 60-minute session and recover from failures |
 | [Operations](docs/operations.md) | Inspect services, validate standalone containers, reset, or troubleshoot |
-| [Verification](docs/verification.md) | Check exactly what ran and what remains pending |
+| [Verification](docs/verification.md) | Check exactly what ran and the limits of that evidence |
 | [Design decision](docs/decisions/001-local-first.md) | Understand the component choices and tradeoffs |
 
 ## Contributing and license

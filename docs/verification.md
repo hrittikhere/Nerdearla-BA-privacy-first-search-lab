@@ -7,13 +7,14 @@ validated. The initial validation date is **20 September 2026**.
 ## Environment
 
 Apple Silicon Mac, 24 GiB unified memory. Python 3.12.11, Ollama 0.32.15,
-OpenCode 1.18.31 for the local harness, Docker sbx 0.43.0. The dry-run generation
-model is Llama 3.2 3B at 16K context and temperature zero; embeddings use
+OpenCode 1.18.31 for both local and sandbox harnesses, Docker sbx 0.43.0 with the
+pinned `opencode-docker` template. The dry-run generation model is Llama 3.2 3B
+at 16K context and temperature zero; embeddings use
 nomic-embed-text:v1.5. Model identities are recorded in the local index.
 
 ## Verified
 
-- **21 automated tests** pass: money precision, page-local chunk identity, table
+- **24 automated tests** pass: money precision, page-local chunk identity, table
   corruption rejection, both vector adapter contracts, exact filtering/pagination,
   stale/partial document rejection, incompatible model rejection, local endpoint
   restrictions, actual MCP stdio handshake/schema errors, idempotence, interrupted
@@ -40,12 +41,23 @@ nomic-embed-text:v1.5. Model identities are recorded in the local index.
 - Docker Compose builds and runs on Docker Desktop, ingests all 40 PDFs into
   Qdrant, and passes MCP and retrieval checks. This validates the service stack,
   not sbx isolation. The sbx kit passes `sbx kit validate`.
+- Docker sbx authentication, diagnostics, custom-kit creation, private Docker
+  daemon, Compose build/start, 40-document ingestion, source verification, MCP
+  discovery, and all ten guided demo steps pass in one uninterrupted run.
+- After preparation, the effective sbx network allowlist contains only
+  `localhost:11435`. Policy checks deny external ports 80 and 443; real requests
+  from the OpenCode environment and MCP container are denied and appear in the
+  policy log. Local Ollama access and retrieval still succeed afterward.
+- Both quotation gates pass from OpenCode inside sbx with real MCP calls. Observed
+  warm sandbox runs took **8.80 seconds** and **6.60 seconds**. These are reference
+  observations, not performance guarantees.
 
 ## Important rehearsal findings
 
 The 3B model can still omit a citation or paraphrase when an exact quote was
 requested. Earlier rehearsals failed the quotation gate. The harness agent now
-sets temperature zero explicitly, and the prepared prompt requests source wording.
+sets temperature zero explicitly, and the prepared prompt requests a two-line
+source quotation and citation format.
 An earlier open-ended jurisdiction prompt also produced an invalid tool request
 and unsupported prose. Both generated-answer steps now stop the walkthrough on a
 failed evidence gate, even if OpenCode exits successfully. Passing these narrow
@@ -54,22 +66,32 @@ retrieved evidence and run the gate again before the event.
 
 An agreement ID embedded in a semantic query initially caused repeated PDF headers
 to outrank the desired clause. A regression fix now separates IDs into filters.
+The model also once added whitespace to a structured document ID; the service now
+normalizes and validates that bounded identifier before applying the exact filter.
 The initial machine's old GPT-OSS model files could not be loaded; no large model
 is used or downloaded as a fallback. The small-model choice is intentional.
 
-## Pending release gates
+The first sbx rehearsal exposed three concrete integration faults: the plain
+OpenCode template had no private Docker socket, Docker Hub redirected a layer to
+an unlisted CloudFront host, and the template's OpenCode 1.18.23 emitted malformed
+text instead of an MCP call. The kit now pins the Docker-enabled template,
+preparation temporarily permits the observed registry redirect, and both paths
+pin OpenCode 1.18.31. A later VM/private-daemon restart stopped Compose services;
+the doctor preflight now restores cached services before checking them.
 
-1. **Actual sbx creation and execution:** blocked on Docker account authentication.
-   `sbx ls --json` currently reports “Not authenticated to Docker.” Run `sbx login`.
-2. **Full sandbox policy and egress verification:** pending the running sandbox,
-   including validation of the CLI's actual policy JSON against the conservative
-   audit parser, local endpoint access, and deny-log evidence from both processes
-   and nested service containers.
-3. **Full guided rehearsal inside sbx:** execute all steps using cached dependencies
-   and the same small model intended for the presentation.
+## Remaining limits and event-day gates
 
-Until those gates pass, call this a working local demo with a prepared sandbox
-integration, not a fully rehearsed isolated workshop.
+1. Repeat `./workshop doctor`, `./workshop privacy-check`, and both quotation gates
+   on the presentation machine immediately before the session.
+2. Review all effective organization, global, kit, and sandbox rules. The finite
+   denial probes do not prove that every untested destination is blocked.
+3. Keep the cached 3B model, packages, and images. Model output can vary even at
+   temperature zero, and a failed evidence gate should remain visible.
+4. Linux and Windows/WSL have not been rehearsed by this verification record.
+
+The reference machine is demo-ready as of **20 September 2026**. This status is
+evidence for that environment and run, not a permanent guarantee for later CLI,
+model-tag, policy, or host changes.
 
 ## Reproduce
 
@@ -84,7 +106,7 @@ python3 scripts/rehearse.py --local --case jurisdiction
 sbx kit validate ./sandbox
 docker compose config --quiet
 
-# After Docker authentication
+./workshop login
 ./workshop prepare
 ./workshop doctor
 ./workshop privacy-check

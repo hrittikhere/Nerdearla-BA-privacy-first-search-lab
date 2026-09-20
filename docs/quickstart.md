@@ -27,18 +27,19 @@ On macOS, install sbx from Docker's official Homebrew tap:
 ```bash
 brew tap docker/tap
 brew install docker/tap/sbx
-sbx login
 ```
 
-Complete Docker's browser sign-in yourself. Never paste credentials into the
-repository or an agent conversation. Existing global sandbox policy is not reset
-by the workshop script.
+After cloning below, `./workshop login` starts Docker's browser device flow only
+when authentication is missing, verifies the session, and runs `sbx diagnose`.
+Never paste credentials into the repository or an agent conversation. Existing
+global sandbox policy is retained by the workshop script.
 
 ## Clone and prepare
 
 ```bash
 git clone https://github.com/rudrakshkarpe/Nerdearla-BA-privacy-first-search-lab.git
 cd Nerdearla-BA-privacy-first-search-lab
+./workshop login
 ./workshop prepare
 ./workshop doctor
 ./workshop privacy-check
@@ -49,11 +50,12 @@ Preparation starts a dedicated host Ollama process at `127.0.0.1:11435` with
 `OLLAMA_NO_CLOUD=1`. It shares your existing model files, but does not change your
 regular Ollama service at port 11434. `/api/status` must report cloud disabled.
 
-The script downloads the corpus if absent, obtains the small language model and
-embedding model, creates the sandbox, temporarily permits dependency destinations,
-builds the Compose services, indexes the corpus, and removes its preparation
-allow rules. Failures stop the script; they are not treated as successful setup.
-Review effective policy before showing a privacy claim.
+The script verifies authentication, downloads the corpus if absent, obtains the
+small language and embedding models, creates or reuses the sandbox, temporarily
+permits dependency destinations, pins OpenCode 1.18.31, builds the Compose
+services, indexes the corpus, and removes its preparation allow rules. Failures
+stop the script; rerunning preparation resumes from cached work. Review effective
+policy before showing a privacy claim.
 
 ## Fast dry run without sandbox authentication
 
