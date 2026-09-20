@@ -24,7 +24,7 @@ class Settings:
     index_dir: Path = field(default_factory=lambda: Path(os.getenv("LAB_INDEX_DIR", "data/index")))
     backend: str = field(default_factory=lambda: os.getenv("LAB_BACKEND", "sqlite"))
     ollama_url: str = field(
-        default_factory=lambda: os.getenv("OLLAMA_URL", "http://127.0.0.1:11434")
+        default_factory=lambda: os.getenv("OLLAMA_URL", "http://127.0.0.1:11435")
     )
     embedding_model: str = field(
         default_factory=lambda: os.getenv("EMBEDDING_MODEL", "nomic-embed-text:v1.5")

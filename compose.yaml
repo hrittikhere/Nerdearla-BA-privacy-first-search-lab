@@ -1,0 +1,66 @@
+name: privacy-first-search-lab
+
+x-lab: &lab
+  build: .
+  image: privacy-first-search-lab:0.1.0
+  environment: &lab-env
+    LAB_BACKEND: qdrant
+    LAB_INDEX_DIR: /state
+    QDRANT_URL: http://qdrant:6333
+    OLLAMA_URL: ${LAB_CONTAINER_OLLAMA_URL:-http://host.docker.internal:11435}
+    EMBEDDING_MODEL: nomic-embed-text:v1.5
+    # Preserve the sandbox's proxy when entering its nested service containers.
+    HTTP_PROXY: ${HTTP_PROXY:-}
+    HTTPS_PROXY: ${HTTPS_PROXY:-}
+    NO_PROXY: ${NO_PROXY:-localhost,127.0.0.1},qdrant,mcp
+  volumes:
+    - lab-state:/state
+  networks: [data, inference]
+  read_only: true
+  tmpfs: [/tmp]
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+
+services:
+  qdrant:
+    image: qdrant/qdrant:v1.15.4
+    environment:
+      QDRANT__TELEMETRY_DISABLED: "true"
+    volumes:
+      - qdrant-data:/qdrant/storage
+    networks: [data]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    # No published database port. Only the MCP/ingestion services can reach it.
+
+  mcp:
+    <<: *lab
+    environment:
+      <<: *lab-env
+      MCP_HOST: 0.0.0.0
+    ports:
+      - "127.0.0.1:8765:8765"
+    depends_on: [qdrant]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8765/health', timeout=3)"]
+      interval: 5s
+      timeout: 4s
+      retries: 20
+
+  ingest:
+    <<: *lab
+    profiles: [tools]
+    volumes:
+      - lab-state:/state
+      - ./data/source:/corpus:ro
+    depends_on: [qdrant]
+    command: [ingest, /corpus]
+
+networks:
+  data:
+    internal: true
+  inference: {}
+
+volumes:
+  lab-state:
+  qdrant-data:
