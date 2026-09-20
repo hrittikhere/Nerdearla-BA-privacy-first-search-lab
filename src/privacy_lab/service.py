@@ -1,4 +1,5 @@
 import hashlib
+import re
 import uuid
 from pathlib import Path
 
@@ -88,7 +89,14 @@ class SearchService:
         if not query.strip() or len(query) > 2000 or not 1 <= limit <= 10:
             raise ValueError("Use a nonempty query up to 2000 characters and limit 1–10")
         self.verify_model()
-        vector = self.embedder.embed([query], query=True)[0]
+        # IDs occur in every page header. Use them as filters, not semantic terms.
+        ids = re.findall(r"DEMO-LA-\d{4}-\d{3}", query, re.IGNORECASE)
+        if document_id is None and len(set(i.upper() for i in ids)) == 1:
+            document_id = ids[0].upper()
+        semantic_query = re.sub(r"DEMO-LA-\d{4}-\d{3}", "", query, flags=re.IGNORECASE).strip()
+        if not semantic_query:
+            raise ValueError("Include a topic as well as the agreement ID")
+        vector = self.embedder.embed([semantic_query], query=True)[0]
         hits = []
         for hit in self.store.search(vector, min(limit * 3, 30), document_id):
             chunk = self.trusted_chunk(hit["chunk"])
