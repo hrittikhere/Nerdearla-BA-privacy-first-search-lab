@@ -14,9 +14,16 @@ PROMPT = (
     "exactly and cite its page. Do not infer any notice period."
 )
 EXPECTED = "The borrower may prepay on a scheduled due date after paying that date's scheduled installment."
+JURISDICTION_PROMPT = (
+    'Use loans_search_documents with query "governing law dispute forum jurisdiction", '
+    'document_id "DEMO-LA-2026-001", limit 3. Copy ONLY the sentence beginning '
+    '"Governing law and dispute forum" exactly from the tool result. '
+    "Then cite document ID DEMO-LA-2026-001 and its page number. Do not add other terms."
+)
+JURISDICTION_EXPECTED = "Governing law and dispute forum are intentionally not designated."
 
 
-def assess(events):
+def assess(events, expected=EXPECTED):
     calls = [e["part"] for e in events if e.get("type") == "tool_use"]
     search = [
         c
@@ -37,8 +44,8 @@ def assess(events):
     ]
     checks = {
         "observed_successful_search_tool_call": bool(search),
-        "expected_sentence_in_tool_evidence": any(EXPECTED in text for text in evidence),
-        "answer_contains_expected_sentence": EXPECTED.lower() in answer.lower(),
+        "expected_sentence_in_tool_evidence": any(expected in text for text in evidence),
+        "answer_contains_expected_sentence": expected.lower() in answer.lower(),
         "answer_names_document": "DEMO-LA-2026-001" in answer,
         "answer_names_page_two": bool(re.search(r"(?:page|p\.)\s*2", answer, re.I)),
         "any_long_prose_quotes_match_evidence": all(
@@ -56,9 +63,12 @@ def assess(events):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--local", action="store_true")
+    parser.add_argument("--case", choices=["prepayment", "jurisdiction"], default="prepayment")
     args = parser.parse_args()
     STATE.mkdir(exist_ok=True)
-    harness = ["opencode", "run", "--format", "json", "--agent", "workshop", PROMPT]
+    prompt = PROMPT if args.case == "prepayment" else JURISDICTION_PROMPT
+    expected = EXPECTED if args.case == "prepayment" else JURISDICTION_EXPECTED
+    harness = ["opencode", "run", "--format", "json", "--agent", "workshop", prompt]
     command = (
         [str(ROOT / ".local/opencode/node_modules/.bin/opencode")] + harness[1:]
         if args.local
@@ -73,18 +83,26 @@ def main():
         capture_output=True,
         timeout=150,
     )
-    (STATE / "rehearsal.jsonl").write_text(result.stdout)
-    (STATE / "rehearsal.stderr").write_text(result.stderr)
+    (STATE / f"rehearsal-{args.case}.jsonl").write_text(result.stdout)
+    (STATE / f"rehearsal-{args.case}.stderr").write_text(result.stderr)
     events = [json.loads(line) for line in result.stdout.splitlines() if line.startswith("{")]
-    report = assess(events)
+    for event in events:
+        if event.get("type") == "tool_use":
+            part = event["part"]
+            print("ACTUAL TOOL CALL:", part.get("tool"), json.dumps(part["state"].get("input")))
+            print("TOOL RESULT:", part["state"].get("output", part["state"].get("error")))
+        elif event.get("type") == "text":
+            print("MODEL RESPONSE:", event["part"]["text"])
+    report = assess(events, expected)
     report.update(
         seconds=round(time.monotonic() - started, 2),
         exit_code=result.returncode,
         mode="local" if args.local else "sbx",
         model="Llama 3.2 3B / 16K context",
+        case=args.case,
     )
     report["passed"] = report["passed"] and result.returncode == 0
-    (STATE / "rehearsal-report.json").write_text(json.dumps(report, indent=2) + "\n")
+    (STATE / f"rehearsal-{args.case}-report.json").write_text(json.dumps(report, indent=2) + "\n")
     print(json.dumps(report, indent=2))
     return 0 if report["passed"] else 1
 

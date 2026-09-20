@@ -49,8 +49,10 @@ to race through evidence inspection.
 7. **MCP:** show the five tool names and input validation working.
 8. **Harness:** watch the actual tool request, evidence, and answer. The prepared
    small-model prompt requests an exact quote so the audience can verify it.
+   A failed quotation/citation gate stops the walkthrough.
 9. **Absence:** ask for an actual governing jurisdiction and inspect the limitation
-   stated in the specimen. Do not claim the entire corpus proves legal compliance.
+   stated in the specimen. This step also requires a matching evidence quote.
+   Do not claim the entire corpus proves legal compliance.
 10. **Boundary:** show denied external traffic and a successful local search.
 
 ## Phrases worth saying explicitly

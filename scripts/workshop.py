@@ -371,18 +371,13 @@ def demo(local=False, start=1, auto=False):
         ("Discover the real MCP tools", lambda: lab(["mcp-smoke"], local)),
         (
             "Watch OpenCode call the search tool and cite its answer",
-            lambda: opencode(
-                local,
-                'Use loans_search_documents with query "fees and voluntary prepayment", '
-                'document_id "DEMO-LA-2026-001", limit 3. Quote the relevant prepayment sentence '
-                "exactly and cite its page. Do not infer any notice period.",
-            ),
+            lambda: run([sys.executable, "scripts/rehearse.py"] + (["--local"] if local else [])),
         ),
         (
             "An unsupported question should not produce an invented fact",
-            lambda: opencode(
-                local,
-                "Search DEMO-LA-2026-001 for governing law. Which actual jurisdiction's law governs it? Cite what the document establishes and clearly say if no jurisdiction is designated.",
+            lambda: run(
+                [sys.executable, "scripts/rehearse.py", "--case", "jurisdiction"]
+                + (["--local"] if local else [])
             ),
         ),
         (
