@@ -1,5 +1,5 @@
 import os
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal
 
 from mcp.server.fastmcp import FastMCP
 from mcp.server.transport_security import TransportSecuritySettings
@@ -39,12 +39,12 @@ def create_server(service: SearchService | None = None) -> FastMCP:
         query: Annotated[str, Field(min_length=1, max_length=2000)],
         document_id: str | None = None,
         limit: Annotated[int, Field(ge=1, le=10)] = 5,
-    ) -> dict:
+    ) -> dict[str, Any]:
         """Find similar passages. Optional exact document ID restricts search. Returns page citations."""
         return service.search(query, limit, document_id)
 
     @server.tool(annotations=readonly)
-    def get_passage(chunk_id: Annotated[str, Field(max_length=36)]) -> dict:
+    def get_passage(chunk_id: Annotated[str, Field(max_length=36)]) -> dict[str, Any]:
         """Retrieve a passage by its returned UUID. Never accepts file paths or URLs."""
         return service.passage(chunk_id)
 
@@ -58,7 +58,7 @@ def create_server(service: SearchService | None = None) -> FastMCP:
         | None = None,
         offset: Annotated[int, Field(ge=0)] = 0,
         limit: Annotated[int, Field(ge=1, le=50)] = 20,
-    ) -> dict:
+    ) -> dict[str, Any]:
         """Exact catalog filter: minimum principal is inclusive, in USD cents. Follow next_offset."""
         return service.catalog.list(
             frequency=frequency,
@@ -73,12 +73,12 @@ def create_server(service: SearchService | None = None) -> FastMCP:
         document_id: str,
         offset: Annotated[int, Field(ge=0)] = 0,
         limit: Annotated[int, Field(ge=1, le=24)] = 12,
-    ) -> dict:
+    ) -> dict[str, Any]:
         """Read validated repayment rows, integer USD cents, with source page numbers and pagination."""
         return service.schedule(document_id, offset, limit)
 
     @server.tool(annotations=readonly)
-    def corpus_status() -> dict:
+    def corpus_status() -> dict[str, Any]:
         """Show ready/failed document counts and the index's embedding identity."""
         return service.catalog.stats()
 
