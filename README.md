@@ -12,7 +12,7 @@ inside Docker sbx, with a dedicated local Ollama process providing inference on 
 host. A lighter local mode lets you rehearse the same retrieval and MCP workflow
 without creating a sandbox.
 
-[![Code and protocol checks](https://github.com/rudrakshkarpe/privacy-first-search-lab/actions/workflows/checks.yml/badge.svg)](https://github.com/rudrakshkarpe/privacy-first-search-lab/actions/workflows/checks.yml)
+[![Code and protocol checks](https://github.com/rudrakshkarpe/Nerdearla-BA-privacy-first-search-lab/actions/workflows/checks.yml/badge.svg)](https://github.com/rudrakshkarpe/Nerdearla-BA-privacy-first-search-lab/actions/workflows/checks.yml)
 
 **Verification status:** local ingestion, SQLite retrieval, containerized Qdrant,
 HTTP MCP, and both small-model quotation rehearsals have passed. The sbx kit
@@ -169,8 +169,8 @@ requires a fresh index.
 Run the commands below from the repository root after installing the prerequisites.
 
 ```bash
-git clone https://github.com/rudrakshkarpe/privacy-first-search-lab.git
-cd privacy-first-search-lab
+git clone https://github.com/rudrakshkarpe/Nerdearla-BA-privacy-first-search-lab.git
+cd Nerdearla-BA-privacy-first-search-lab
 ```
 
 ### Fast local dry run
@@ -455,7 +455,7 @@ O(number of chunks × vector dimensions) query cost. Qdrant supplies the dedicat
 vector-store path. Parser, backend, and embedding changes need compatible index
 state; use separate indexes when experimenting.
 
-Read the [commit history](https://github.com/rudrakshkarpe/privacy-first-search-lab/commits/main/)
+Read the [commit history](https://github.com/rudrakshkarpe/Nerdearla-BA-privacy-first-search-lab/commits/main/)
 to follow architecture, parsing, retrieval, MCP, containers, sandbox configuration,
 small-model tuning, regression fixes, and rehearsal as focused changes.
 
@@ -483,7 +483,7 @@ and require inspection before stopping. Local cleanup is documented separately;
 ## Repository map and further reading
 
 ```text
-privacy-first-search-lab/
+Nerdearla-BA-privacy-first-search-lab/
 ├── workshop                  # Executable entry point for setup and presentation
 ├── scripts/
 │   ├── workshop.py           # Preparation, preflight, and guided demo

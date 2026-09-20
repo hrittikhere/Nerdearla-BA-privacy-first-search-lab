@@ -37,8 +37,8 @@ by the workshop script.
 ## Clone and prepare
 
 ```bash
-git clone https://github.com/rudrakshkarpe/privacy-first-search-lab.git
-cd privacy-first-search-lab
+git clone https://github.com/rudrakshkarpe/Nerdearla-BA-privacy-first-search-lab.git
+cd Nerdearla-BA-privacy-first-search-lab
 ./workshop prepare
 ./workshop doctor
 ./workshop privacy-check
