@@ -1,0 +1,38 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "privacy-first-search-lab"
+version = "0.1.0"
+description = "Local PDF retrieval and read-only MCP tools for a privacy-first workshop"
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+license = "MIT"
+dependencies = [
+  "httpx>=0.28,<1",
+  "mcp>=1.26,<2",
+  "pydantic>=2.11,<3",
+  "pypdf>=6,<7",
+  "qdrant-client>=1.14,<2",
+  "filelock>=3.18,<4",
+]
+
+[project.scripts]
+privacy-lab = "privacy_lab.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8,<10", "ruff>=0.12,<1", "jsonschema>=4,<5"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/privacy_lab"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
