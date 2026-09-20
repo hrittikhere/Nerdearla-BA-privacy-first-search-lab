@@ -40,6 +40,7 @@ uv run ruff format --check src scripts tests
 # Actual corpus/model checks
 OLLAMA_URL=http://127.0.0.1:11435 PYTHONPATH=src uv run python scripts/evaluate.py
 python3 scripts/rehearse.py --local
+python3 scripts/rehearse.py --local --case jurisdiction
 
 # Sandbox services and logs
 sbx exec -w "$PWD" privacy-search-lab docker compose ps
@@ -127,3 +128,18 @@ metadata. To add remote/multi-user MCP access, design authentication, authorizat
 transport security, and retention first. To add web retrieval, declare a separate
 online mode and its data-exposure boundary; the current presentation makes no web
 requests for grounding.
+
+## Standalone container validation
+
+To run Compose alongside the local MCP server, publish its MCP endpoint on a
+separate loopback port. This exercises Qdrant and container packaging without
+claiming sbx isolation. Start the dedicated Ollama endpoint first.
+
+```bash
+./workshop models-start
+BUILDX_BUILDER=desktop-linux docker compose build
+LAB_MCP_PORT=8766 docker compose up -d --wait
+LAB_MCP_PORT=8766 docker compose run --rm ingest
+PYTHONPATH=src uv run privacy-lab mcp-smoke --url http://127.0.0.1:8766/mcp
+LAB_MCP_PORT=8766 docker compose exec -T mcp python - < scripts/evaluate.py
+```

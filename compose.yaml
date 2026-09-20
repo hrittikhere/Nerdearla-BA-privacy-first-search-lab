@@ -39,7 +39,7 @@ services:
       <<: *lab-env
       MCP_HOST: 0.0.0.0
     ports:
-      - "127.0.0.1:8765:8765"
+      - "127.0.0.1:${LAB_MCP_PORT:-8765}:8765"
     depends_on: [qdrant]
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8765/health', timeout=3)"]

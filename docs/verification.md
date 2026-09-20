@@ -21,26 +21,35 @@ nomic-embed-text:v1.5. Model identities are recorded in the local index.
 - All **40 source PDFs** parse: **178 pages**, **481 chunks**, **1,744 repayment rows**.
   Page-one metadata and full schedules reconcile. A repayment table was also
   rendered and visually checked against extraction.
-- Real local Ollama embeddings populate the SQLite vector implementation; all
-  40 documents are ready. Source SHA-256 verification passes.
+- Real local Ollama embeddings populate both the SQLite vector implementation
+  and the containerized Qdrant backend; all 40 documents are ready in each.
+  Source SHA-256 verification passes for the local corpus.
 - Six real-corpus acceptance checks pass: four clause retrieval cases, the exact
   count of **10 quarterly loans strictly above $10 million**, and the 12-row
-  agreement-001 schedule ending at zero balance.
+  agreement-001 schedule ending at zero balance. These checks pass against both
+  the local SQLite backend and the Docker Compose Qdrant backend.
 - The actual HTTP MCP server completes tool discovery, a catalog call, and an
-  invalid-request rejection. This is separate from the automated stdio test.
-- The small-model harness makes a real `loans_search_documents` call and passes
-  the narrow quotation/citation gate. One warm rehearsal took **10.17 seconds**.
+  invalid-request rejection against both local and containerized servers. This
+  is separate from the automated stdio test.
+- The small-model harness makes real `loans_search_documents` calls and passes
+  both narrow quotation/citation gates: prepayment and unspecified jurisdiction.
+  Warm local rehearsals took **5.27 seconds** and **5.10 seconds**, respectively.
   This is an observation from one machine/run, not a performance guarantee.
 - The dedicated host Ollama endpoint reports cloud support disabled.
 - OpenCode configuration validates against the published schema's local structure.
-- Docker Compose configuration validates; the sbx kit passes `sbx kit validate`.
+- Docker Compose builds and runs on Docker Desktop, ingests all 40 PDFs into
+  Qdrant, and passes MCP and retrieval checks. This validates the service stack,
+  not sbx isolation. The sbx kit passes `sbx kit validate`.
 
 ## Important rehearsal findings
 
 The 3B model can still omit a citation or paraphrase when an exact quote was
 requested. Earlier rehearsals failed the quotation gate. The harness agent now
 sets temperature zero explicitly, and the prepared prompt requests source wording.
-Passing this narrow check does not establish general answer reliability. Show the
+An earlier open-ended jurisdiction prompt also produced an invalid tool request
+and unsupported prose. Both generated-answer steps now stop the walkthrough on a
+failed evidence gate, even if OpenCode exits successfully. Passing these narrow
+checks does not establish general answer reliability. Show the
 retrieved evidence and run the gate again before the event.
 
 An agreement ID embedded in a semantic query initially caused repeated PDF headers
@@ -71,6 +80,7 @@ uv run ruff format --check src scripts tests
 ./workshop doctor --local
 OLLAMA_URL=http://127.0.0.1:11435 PYTHONPATH=src uv run python scripts/evaluate.py
 python3 scripts/rehearse.py --local
+python3 scripts/rehearse.py --local --case jurisdiction
 sbx kit validate ./sandbox
 docker compose config --quiet
 
