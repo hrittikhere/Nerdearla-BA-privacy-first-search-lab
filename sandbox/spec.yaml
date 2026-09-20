@@ -1,0 +1,19 @@
+schemaVersion: "2"
+kind: sandbox
+name: privacy-search-lab
+description: Local document retrieval with OpenCode and no cloud credentials
+sandbox:
+  image: docker/sandbox-templates:opencode@sha256:88a078fc021d0a2b4c3315f21a6f05dfdda5a6b30369a53d185b5b6544465efc
+  entrypoint: [opencode]
+environment:
+  variables:
+    LAB_OLLAMA_OPENAI_URL: http://host.docker.internal:11435/v1
+    OPENCODE_DISABLE_AUTOUPDATE: "true"
+    OPENCODE_DISABLE_MODELS_FETCH: "true"
+    OPENCODE_DISABLE_DEFAULT_PLUGINS: "true"
+    OPENCODE_DISABLE_LSP_DOWNLOAD: "true"
+    OPENCODE_DISABLE_CLAUDE_CODE: "true"
+permissions:
+  network:
+    allow:
+      - localhost:11435
