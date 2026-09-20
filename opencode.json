@@ -1,8 +1,8 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "enabled_providers": ["ollama"],
-  "model": "ollama/privacy-lab-gpt-oss",
-  "small_model": "ollama/privacy-lab-gpt-oss",
+  "model": "ollama/privacy-lab-local",
+  "small_model": "ollama/privacy-lab-local",
   "share": "disabled",
   "autoupdate": false,
   "snapshot": false,
@@ -17,10 +17,10 @@
         "timeout": 180000
       },
       "models": {
-        "privacy-lab-gpt-oss": {
-          "name": "Local GPT-OSS 20B — 64K context",
+        "privacy-lab-local": {
+          "name": "Local Llama 3.2 3B — 16K demo context",
           "tool_call": true,
-          "limit": {"context": 65536, "output": 4096}
+          "limit": {"context": 16384, "output": 2048}
         }
       }
     }

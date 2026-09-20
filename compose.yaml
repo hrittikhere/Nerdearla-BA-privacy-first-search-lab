@@ -23,7 +23,7 @@ x-lab: &lab
 
 services:
   qdrant:
-    image: qdrant/qdrant:v1.15.4
+    image: qdrant/qdrant:v1.19.1@sha256:12364fe851b9f17356fc88189fc06d1b521262e04659ec7345975b00c9246a10
     environment:
       QDRANT__TELEMETRY_DISABLED: "true"
     volumes:
