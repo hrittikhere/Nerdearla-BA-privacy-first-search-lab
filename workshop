@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+LAB_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+exec python3 "$LAB_ROOT/scripts/workshop.py" "$@"
