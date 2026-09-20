@@ -1,5 +1,11 @@
 # Architecture and trust boundaries
 
+[![End-to-end workshop workflow with product logos, runtime boundaries, data stores, and numbered ingestion and question-answering paths](assets/workshop-workflow.svg)](assets/workshop-workflow.svg)
+
+The diagram is the presentation view of the system. The sections below explain
+the ownership and security limits behind each connection. Its numbered route is
+also described in the [main workshop guide](../README.md#architecture-and-the-role-of-docker-sbx).
+
 ## Two flows, one local system
 
 **Ingestion:** source PDF → page text → bounded chunks → local embedding model →

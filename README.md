@@ -62,30 +62,25 @@ reference with a single-user trust boundary, not a multi-tenant compliance platf
 
 ## Architecture and the role of Docker sbx
 
-```mermaid
-flowchart TB
-  subgraph HOST["Your computer — local trust boundary"]
-    O["Host Ollama: embeddings + small language model"]
-    subgraph SBX["Docker sbx microVM"]
-      A["OpenCode workshop agent"]
-      subgraph COMPOSE["Sandbox Docker daemon / Compose"]
-        I["PDF parser + page-aware chunker"]
-        M["Read-only search MCP server"]
-        Q[("Qdrant: vectors + passages")]
-        C[("SQLite: exact catalog + repayment rows")]
-        I --> Q
-        I --> C
-        M --> Q
-        M --> C
-      end
-      A -->|MCP tool calls| M
-      D["Corpus mounted read-only into ingestion container"] --> I
-    end
-    I -->|local document embeddings| O
-    M -->|local query embeddings| O
-    A -->|local inference| O
-  end
-```
+[![Complete workflow for the privacy-first search lab, including Docker sbx, OpenCode, MCP, Ollama, Qdrant, SQLite, ingestion, retrieval, policy, and evidence flows](docs/assets/workshop-workflow.svg)](docs/assets/workshop-workflow.svg)
+
+The numbered route follows the live demonstration:
+
+1. Mount the verified PDF corpus read-only into the one-shot ingestion container.
+2. Extract and chunk each page, create embeddings with local Ollama, and persist
+   passages in Qdrant plus exact metadata and repayment rows in SQLite.
+3. Send an audience question to the constrained OpenCode workshop agent.
+4. Let the small local model choose a permitted action through the dedicated Ollama
+   endpoint; no hosted provider is configured.
+5. Call one of five bounded, read-only MCP tools over the loopback HTTP endpoint.
+6. Validate arguments and retrieve semantic passages or exact structured records.
+7. Return evidence with document IDs and page numbers for local synthesis.
+8. Present the cited answer while sbx policy continues to deny unrelated egress.
+
+The blue border is the sbx microVM. Its private Docker daemon owns the Compose
+containers, networks, images, and volumes. The host Ollama process remains outside
+that border so it can use local hardware acceleration. Colored lines distinguish
+document movement, model calls, MCP orchestration, evidence, and denied traffic.
 
 ### Two data flows
 

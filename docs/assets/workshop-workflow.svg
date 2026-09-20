@@ -1,0 +1,195 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1800" height="1220" viewBox="0 0 1800 1220" role="img" aria-labelledby="title desc">
+<title id="title">Privacy First Search Lab end-to-end workshop workflow</title>
+<desc id="desc">A complete workflow showing source PDFs and manifest entering a Docker sbx microVM, ingestion through Python and local Ollama embeddings into Qdrant and SQLite, and questions flowing through OpenCode and a read-only MCP server to cited evidence and a final local answer. Network policy blocks cloud egress.</desc>
+<defs>
+  <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#1C2B4A" flood-opacity="0.10"/></filter>
+  <marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#2F80ED"/></marker>
+  <marker id="arrow-orange" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#F59E0B"/></marker>
+  <marker id="arrow-purple" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#6D28D9"/></marker>
+  <marker id="arrow-green" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#0F9D77"/></marker>
+  <marker id="arrow-red" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#E35D6A"/></marker>
+  <marker id="arrow-docker" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#2496ED"/></marker>
+  <marker id="arrow-gray" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#536176"/></marker>
+  <pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse"><path d="M 28 0 L 0 0 0 28" fill="none" stroke="#DCE4EF" stroke-width="1" opacity="0.35"/></pattern>
+
+<symbol id="logo-docker" viewBox="0 0 24 24" fill="#2496ED"><title xmlns="http://www.w3.org/2000/svg">Docker</title><path xmlns="http://www.w3.org/2000/svg" d="M13.983 11.078h2.119a.186.186 0 00.186-.185V9.006a.186.186 0 00-.186-.186h-2.119a.185.185 0 00-.185.185v1.888c0 .102.083.185.185.185m-2.954-5.43h2.118a.186.186 0 00.186-.186V3.574a.186.186 0 00-.186-.185h-2.118a.185.185 0 00-.185.185v1.888c0 .102.082.185.185.185m0 2.716h2.118a.187.187 0 00.186-.186V6.29a.186.186 0 00-.186-.185h-2.118a.185.185 0 00-.185.185v1.887c0 .102.082.185.185.186m-2.93 0h2.12a.186.186 0 00.184-.186V6.29a.185.185 0 00-.185-.185H8.1a.185.185 0 00-.185.185v1.887c0 .102.083.185.185.186m-2.964 0h2.119a.186.186 0 00.185-.186V6.29a.185.185 0 00-.185-.185H5.136a.186.186 0 00-.186.185v1.887c0 .102.084.185.186.186m5.893 2.715h2.118a.186.186 0 00.186-.185V9.006a.186.186 0 00-.186-.186h-2.118a.185.185 0 00-.185.185v1.888c0 .102.082.185.185.185m-2.93 0h2.12a.185.185 0 00.184-.185V9.006a.185.185 0 00-.184-.186h-2.12a.185.185 0 00-.184.185v1.888c0 .102.083.185.185.185m-2.964 0h2.119a.185.185 0 00.185-.185V9.006a.185.185 0 00-.184-.186h-2.12a.186.186 0 00-.186.186v1.887c0 .102.084.185.186.185m-2.92 0h2.12a.185.185 0 00.184-.185V9.006a.185.185 0 00-.184-.186h-2.12a.185.185 0 00-.184.185v1.888c0 .102.082.185.185.185M23.763 9.89c-.065-.051-.672-.51-1.954-.51-.338.001-.676.03-1.01.087-.248-1.7-1.653-2.53-1.716-2.566l-.344-.199-.226.327c-.284.438-.49.922-.612 1.43-.23.97-.09 1.882.403 2.661-.595.332-1.55.413-1.744.42H.751a.751.751 0 00-.75.748 11.376 11.376 0 00.692 4.062c.545 1.428 1.355 2.48 2.41 3.124 1.18.723 3.1 1.137 5.275 1.137.983.003 1.963-.086 2.93-.266a12.248 12.248 0 003.823-1.389c.98-.567 1.86-1.288 2.61-2.136 1.252-1.418 1.998-2.997 2.553-4.4h.221c1.372 0 2.215-.549 2.68-1.009.309-.293.55-.65.707-1.046l.098-.288Z" /></symbol>
+<symbol id="logo-ollama" viewBox="0 0 24 24" fill="#000000"><title xmlns="http://www.w3.org/2000/svg">Ollama</title><path xmlns="http://www.w3.org/2000/svg" d="M16.361 10.26a.894.894 0 0 0-.558.47l-.072.148.001.207c0 .193.004.217.059.353.076.193.152.312.291.448.24.238.51.3.872.205a.86.86 0 0 0 .517-.436.752.752 0 0 0 .08-.498c-.064-.453-.33-.782-.724-.897a1.06 1.06 0 0 0-.466 0zm-9.203.005c-.305.096-.533.32-.65.639a1.187 1.187 0 0 0-.06.52c.057.309.31.59.598.667.362.095.632.033.872-.205.14-.136.215-.255.291-.448.055-.136.059-.16.059-.353l.001-.207-.072-.148a.894.894 0 0 0-.565-.472 1.02 1.02 0 0 0-.474.007Zm4.184 2c-.131.071-.223.25-.195.383.031.143.157.288.353.407.105.063.112.072.117.136.004.038-.01.146-.029.243-.02.094-.036.194-.036.222.002.074.07.195.143.253.064.052.076.054.255.059.164.005.198.001.264-.03.169-.082.212-.234.15-.525-.052-.243-.042-.28.087-.355.137-.08.281-.219.324-.314a.365.365 0 0 0-.175-.48.394.394 0 0 0-.181-.033c-.126 0-.207.03-.355.124l-.085.053-.053-.032c-.219-.13-.259-.145-.391-.143a.396.396 0 0 0-.193.032zm.39-2.195c-.373.036-.475.05-.654.086-.291.06-.68.195-.951.328-.94.46-1.589 1.226-1.787 2.114-.04.176-.045.234-.045.53 0 .294.005.357.043.524.264 1.16 1.332 2.017 2.714 2.173.3.033 1.596.033 1.896 0 1.11-.125 2.064-.727 2.493-1.571.114-.226.169-.372.22-.602.039-.167.044-.23.044-.523 0-.297-.005-.355-.045-.531-.288-1.29-1.539-2.304-3.072-2.497a6.873 6.873 0 0 0-.855-.031zm.645.937a3.283 3.283 0 0 1 1.44.514c.223.148.537.458.671.662.166.251.26.508.303.82.02.143.01.251-.043.482-.08.345-.332.705-.672.957a3.115 3.115 0 0 1-.689.348c-.382.122-.632.144-1.525.138-.582-.006-.686-.01-.853-.042-.57-.107-1.022-.334-1.35-.68-.264-.28-.385-.535-.45-.946-.03-.192.025-.509.137-.776.136-.326.488-.73.836-.963.403-.269.934-.46 1.422-.512.187-.02.586-.02.773-.002zm-5.503-11a1.653 1.653 0 0 0-.683.298C5.617.74 5.173 1.666 4.985 2.819c-.07.436-.119 1.04-.119 1.503 0 .544.064 1.24.155 1.721.02.107.031.202.023.208a8.12 8.12 0 0 1-.187.152 5.324 5.324 0 0 0-.949 1.02 5.49 5.49 0 0 0-.94 2.339 6.625 6.625 0 0 0-.023 1.357c.091.78.325 1.438.727 2.04l.13.195-.037.064c-.269.452-.498 1.105-.605 1.732-.084.496-.095.629-.095 1.294 0 .67.009.803.088 1.266.095.555.288 1.143.503 1.534.071.128.243.393.264.407.007.003-.014.067-.046.141a7.405 7.405 0 0 0-.548 1.873c-.062.417-.071.552-.071.991 0 .56.031.832.148 1.279L3.42 24h1.478l-.05-.091c-.297-.552-.325-1.575-.068-2.597.117-.472.25-.819.498-1.296l.148-.29v-.177c0-.165-.003-.184-.057-.293a.915.915 0 0 0-.194-.25 1.74 1.74 0 0 1-.385-.543c-.424-.92-.506-2.286-.208-3.451.124-.486.329-.918.544-1.154a.787.787 0 0 0 .223-.531c0-.195-.07-.355-.224-.522a3.136 3.136 0 0 1-.817-1.729c-.14-.96.114-2.005.69-2.834.563-.814 1.353-1.336 2.237-1.475.199-.033.57-.028.776.01.226.04.367.028.512-.041.179-.085.268-.19.374-.431.093-.215.165-.333.36-.576.234-.29.46-.489.822-.729.413-.27.884-.467 1.352-.561.17-.035.25-.04.569-.04.319 0 .398.005.569.04a4.07 4.07 0 0 1 1.914.997c.117.109.398.457.488.602.034.057.095.177.132.267.105.241.195.346.374.43.14.068.286.082.503.045.343-.058.607-.053.943.016 1.144.23 2.14 1.173 2.581 2.437.385 1.108.276 2.267-.296 3.153-.097.15-.193.27-.333.419-.301.322-.301.722-.001 1.053.493.539.801 1.866.708 3.036-.062.772-.26 1.463-.533 1.854a2.096 2.096 0 0 1-.224.258.916.916 0 0 0-.194.25c-.054.109-.057.128-.057.293v.178l.148.29c.248.476.38.823.498 1.295.253 1.008.231 2.01-.059 2.581a.845.845 0 0 0-.044.098c0 .006.329.009.732.009h.73l.02-.074.036-.134c.019-.076.057-.3.088-.516.029-.217.029-1.016 0-1.258-.11-.875-.295-1.57-.597-2.226-.032-.074-.053-.138-.046-.141.008-.005.057-.074.108-.152.376-.569.607-1.284.724-2.228.031-.26.031-1.378 0-1.628-.083-.645-.182-1.082-.348-1.525a6.083 6.083 0 0 0-.329-.7l-.038-.064.131-.194c.402-.604.636-1.262.727-2.04a6.625 6.625 0 0 0-.024-1.358 5.512 5.512 0 0 0-.939-2.339 5.325 5.325 0 0 0-.95-1.02 8.097 8.097 0 0 1-.186-.152.692.692 0 0 1 .023-.208c.208-1.087.201-2.443-.017-3.503-.19-.924-.535-1.658-.98-2.082-.354-.338-.716-.482-1.15-.455-.996.059-1.8 1.205-2.116 3.01a6.805 6.805 0 0 0-.097.726c0 .036-.007.066-.015.066a.96.96 0 0 1-.149-.078A4.857 4.857 0 0 0 12 3.03c-.832 0-1.687.243-2.456.698a.958.958 0 0 1-.148.078c-.008 0-.015-.03-.015-.066a6.71 6.71 0 0 0-.097-.725C8.997 1.392 8.337.319 7.46.048a2.096 2.096 0 0 0-.585-.041Zm.293 1.402c.248.197.523.759.682 1.388.03.113.06.244.069.292.007.047.026.152.041.233.067.365.098.76.102 1.24l.002.475-.12.175-.118.178h-.278c-.324 0-.646.041-.954.124l-.238.06c-.033.007-.038-.003-.057-.144a8.438 8.438 0 0 1 .016-2.323c.124-.788.413-1.501.696-1.711.067-.05.079-.049.157.013zm9.825-.012c.17.126.358.46.498.888.28.854.36 2.028.212 3.145-.019.14-.024.151-.057.144l-.238-.06a3.693 3.693 0 0 0-.954-.124h-.278l-.119-.178-.119-.175.002-.474c.004-.669.066-1.19.214-1.772.157-.623.434-1.185.68-1.382.078-.062.09-.063.159-.012z" /></symbol>
+<symbol id="logo-opencode" viewBox="0 0 24 24" fill="#000000"><title xmlns="http://www.w3.org/2000/svg">OpenCode</title><path xmlns="http://www.w3.org/2000/svg" d="M22 24H2V0h20zM17 4.8H7v14.4h10z" /></symbol>
+<symbol id="logo-qdrant" viewBox="0 0 24 24" fill="#DC244C"><title xmlns="http://www.w3.org/2000/svg">Qdrant</title><path xmlns="http://www.w3.org/2000/svg" d="m12 16.5 3.897-2.25v-4.5L12 7.5 8.103 9.75v4.5zM1.607 18 12 24l3.897-2.25v-4.5L12 19.5l-6.495-3.75v-7.5L12 4.5l6.495 3.75v15L22.393 21V6L12 0 1.607 6Z" /></symbol>
+<symbol id="logo-sqlite" viewBox="0 0 24 24" fill="#003B57"><title xmlns="http://www.w3.org/2000/svg">SQLite</title><path xmlns="http://www.w3.org/2000/svg" d="M21.678.521c-1.032-.92-2.28-.55-3.513.544a8.71 8.71 0 0 0-.547.535c-2.109 2.237-4.066 6.38-4.674 9.544.237.48.422 1.093.544 1.561a13.044 13.044 0 0 1 .164.703s-.019-.071-.096-.296l-.05-.146a1.689 1.689 0 0 0-.033-.08c-.138-.32-.518-.995-.686-1.289-.143.423-.27.818-.376 1.176.484.884.778 2.4.778 2.4s-.025-.099-.147-.442c-.107-.303-.644-1.244-.772-1.464-.217.804-.304 1.346-.226 1.478.152.256.296.698.422 1.186.286 1.1.485 2.44.485 2.44l.017.224a22.41 22.41 0 0 0 .056 2.748c.095 1.146.273 2.13.5 2.657l.155-.084c-.334-1.038-.47-2.399-.41-3.967.09-2.398.642-5.29 1.661-8.304 1.723-4.55 4.113-8.201 6.3-9.945-1.993 1.8-4.692 7.63-5.5 9.788-.904 2.416-1.545 4.684-1.931 6.857.666-2.037 2.821-2.912 2.821-2.912s1.057-1.304 2.292-3.166c-.74.169-1.955.458-2.362.629-.6.251-.762.337-.762.337s1.945-1.184 3.613-1.72C21.695 7.9 24.195 2.767 21.678.521m-18.573.543A1.842 1.842 0 0 0 1.27 2.9v16.608a1.84 1.84 0 0 0 1.835 1.834h9.418a22.953 22.953 0 0 1-.052-2.707c-.006-.062-.011-.141-.016-.2a27.01 27.01 0 0 0-.473-2.378c-.121-.47-.275-.898-.369-1.057-.116-.197-.098-.31-.097-.432 0-.12.015-.245.037-.386a9.98 9.98 0 0 1 .234-1.045l.217-.028c-.017-.035-.014-.065-.031-.097l-.041-.381a32.8 32.8 0 0 1 .382-1.194l.2-.019c-.008-.016-.01-.038-.018-.053l-.043-.316c.63-3.28 2.587-7.443 4.8-9.791.066-.069.133-.128.198-.194Z" /></symbol>
+<symbol id="logo-python" viewBox="0 0 24 24" fill="#3776AB"><title xmlns="http://www.w3.org/2000/svg">Python</title><path xmlns="http://www.w3.org/2000/svg" d="M14.25.18l.9.2.73.26.59.3.45.32.34.34.25.34.16.33.1.3.04.26.02.2-.01.13V8.5l-.05.63-.13.55-.21.46-.26.38-.3.31-.33.25-.35.19-.35.14-.33.1-.3.07-.26.04-.21.02H8.77l-.69.05-.59.14-.5.22-.41.27-.33.32-.27.35-.2.36-.15.37-.1.35-.07.32-.04.27-.02.21v3.06H3.17l-.21-.03-.28-.07-.32-.12-.35-.18-.36-.26-.36-.36-.35-.46-.32-.59-.28-.73-.21-.88-.14-1.05-.05-1.23.06-1.22.16-1.04.24-.87.32-.71.36-.57.4-.44.42-.33.42-.24.4-.16.36-.1.32-.05.24-.01h.16l.06.01h8.16v-.83H6.18l-.01-2.75-.02-.37.05-.34.11-.31.17-.28.25-.26.31-.23.38-.2.44-.18.51-.15.58-.12.64-.1.71-.06.77-.04.84-.02 1.27.05zm-6.3 1.98l-.23.33-.08.41.08.41.23.34.33.22.41.09.41-.09.33-.22.23-.34.08-.41-.08-.41-.23-.33-.33-.22-.41-.09-.41.09zm13.09 3.95l.28.06.32.12.35.18.36.27.36.35.35.47.32.59.28.73.21.88.14 1.04.05 1.23-.06 1.23-.16 1.04-.24.86-.32.71-.36.57-.4.45-.42.33-.42.24-.4.16-.36.09-.32.05-.24.02-.16-.01h-8.22v.82h5.84l.01 2.76.02.36-.05.34-.11.31-.17.29-.25.25-.31.24-.38.2-.44.17-.51.15-.58.13-.64.09-.71.07-.77.04-.84.01-1.27-.04-1.07-.14-.9-.2-.73-.25-.59-.3-.45-.33-.34-.34-.25-.34-.16-.33-.1-.3-.04-.25-.02-.2.01-.13v-5.34l.05-.64.13-.54.21-.46.26-.38.3-.32.33-.24.35-.2.35-.14.33-.1.3-.06.26-.04.21-.02.13-.01h5.84l.69-.05.59-.14.5-.21.41-.28.33-.32.27-.35.2-.36.15-.36.1-.35.07-.32.04-.28.02-.21V6.07h2.09l.14.01zm-6.47 14.25l-.23.33-.08.41.08.41.23.33.33.23.41.08.41-.08.33-.23.23-.33.08-.41-.08-.41-.23-.33-.33-.23-.41-.08-.41.08z" /></symbol>
+<symbol id="logo-modelcontextprotocol" viewBox="0 0 24 24" fill="#000000"><title xmlns="http://www.w3.org/2000/svg">Model Context Protocol</title><path xmlns="http://www.w3.org/2000/svg" d="M13.85 0a4.16 4.16 0 0 0-2.95 1.217L1.456 10.66a.835.835 0 0 0 0 1.18.835.835 0 0 0 1.18 0l9.442-9.442a2.49 2.49 0 0 1 3.541 0 2.49 2.49 0 0 1 0 3.541L8.59 12.97l-.1.1a.835.835 0 0 0 0 1.18.835.835 0 0 0 1.18 0l.1-.098 7.03-7.034a2.49 2.49 0 0 1 3.542 0l.049.05a2.49 2.49 0 0 1 0 3.54l-8.54 8.54a1.96 1.96 0 0 0 0 2.755l1.753 1.753a.835.835 0 0 0 1.18 0 .835.835 0 0 0 0-1.18l-1.753-1.753a.266.266 0 0 1 0-.394l8.54-8.54a4.185 4.185 0 0 0 0-5.9l-.05-.05a4.16 4.16 0 0 0-2.95-1.218c-.2 0-.401.02-.6.048a4.17 4.17 0 0 0-1.17-3.552A4.16 4.16 0 0 0 13.85 0m0 3.333a.84.84 0 0 0-.59.245L6.275 10.56a4.186 4.186 0 0 0 0 5.902 4.186 4.186 0 0 0 5.902 0L19.16 9.48a.835.835 0 0 0 0-1.18.835.835 0 0 0-1.18 0l-6.985 6.984a2.49 2.49 0 0 1-3.54 0 2.49 2.49 0 0 1 0-3.54l6.983-6.985a.835.835 0 0 0 0-1.18.84.84 0 0 0-.59-.245" /></symbol>
+</defs>
+<rect width="1800" height="1220" fill="#F5F7FB"/>
+<rect width="1800" height="1220" fill="url(#grid)"/>
+<text x="70" y="64" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="16" font-weight="800" fill="#2F80ED" text-anchor="start">PRIVACY-FIRST SEARCH LAB</text>
+<text x="70" y="105" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="34" font-weight="800" fill="#172033" text-anchor="start">From local documents to cited answers — inside Docker sbx</text>
+<text x="70" y="137" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="18" font-weight="450" fill="#536176" text-anchor="start">One machine • one controlled boundary • no hosted model or vector database</text>
+<rect x="1390" y="60" width="330" height="32" rx="16" fill="#EAFBF5"/>
+<text x="1555.0" y="82" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="700" fill="#087A55" text-anchor="middle">Nerdearla Argentina 2026</text>
+<rect x="45" y="165" width="1710" height="1000" rx="30" fill="#FBFCFE" stroke="#98A7BA" stroke-width="3"/>
+<rect x="45" y="165" width="1710" height="58" rx="30" fill="#EEF2F7"/>
+<text x="78" y="202" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="17" font-weight="800" fill="#3E4C61" text-anchor="start">HOST MACHINE · local trust boundary</text>
+<rect x="1410" y="178" width="300" height="32" rx="16" fill="#EAFBF5"/>
+<text x="1560.0" y="200" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="700" fill="#087A55" text-anchor="middle">data remains on this machine</text>
+<rect x="85" y="265" width="285" height="118" rx="18" fill="#FFFFFF" stroke="#D5DEEA" stroke-width="2" filter="url(#shadow)"/>
+<rect x="85" y="265" width="8" height="118" rx="4" fill="#2496ED"/>
+<rect x="109" y="287" width="56" height="56" rx="14" fill="#F6F8FB"/>
+<use href="#logo-docker" x="119" y="297" width="36" height="36"/>
+<text x="181" y="308" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="21" font-weight="750" fill="#172033" text-anchor="start">Workshop controls</text>
+<text x="181" y="335" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="450" fill="#536176" text-anchor="start">./workshop login → prepare</text>
+<text x="181" y="356" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="450" fill="#536176" text-anchor="start">doctor → privacy-check → demo</text>
+<rect x="85" y="430" width="285" height="128" rx="18" fill="#FFFFFF" stroke="#D5DEEA" stroke-width="2" filter="url(#shadow)"/>
+<rect x="85" y="430" width="8" height="128" rx="4" fill="#2F80ED"/>
+<rect x="109" y="452" width="56" height="56" rx="14" fill="#F6F8FB"/>
+<use href="#logo-python" x="119" y="462" width="36" height="36"/>
+<text x="181" y="473" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="21" font-weight="750" fill="#172033" text-anchor="start">Compliance corpus</text>
+<text x="181" y="500" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="450" fill="#536176" text-anchor="start">40 source PDFs + manifest</text>
+<text x="181" y="521" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="450" fill="#536176" text-anchor="start">SHA-256 provenance</text>
+<rect x="115" y="571" width="225" height="32" rx="16" fill="#E8F2FF"/>
+<text x="227.5" y="593" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="700" fill="#1565C0" text-anchor="middle">read-only corpus mount</text>
+<rect x="85" y="830" width="285" height="165" rx="18" fill="#FFFFFF" stroke="#D5DEEA" stroke-width="2" filter="url(#shadow)"/>
+<rect x="85" y="830" width="8" height="165" rx="4" fill="#111827"/>
+<rect x="109" y="852" width="56" height="56" rx="14" fill="#F6F8FB"/>
+<use href="#logo-ollama" x="119" y="862" width="36" height="36"/>
+<text x="181" y="873" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="21" font-weight="750" fill="#172033" text-anchor="start">Local Ollama</text>
+<text x="181" y="900" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="450" fill="#536176" text-anchor="start">Llama 3.2 3B · generation</text>
+<text x="181" y="921" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="450" fill="#536176" text-anchor="start">nomic-embed-text · vectors</text>
+<text x="181" y="942" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="450" fill="#536176" text-anchor="start">cloud features disabled</text>
+<rect x="115" y="1010" width="225" height="32" rx="16" fill="#FFF2E8"/>
+<text x="227.5" y="1032" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="700" fill="#B45309" text-anchor="middle">localhost:11435 only</text>
+<circle cx="227" cy="716" r="42" fill="#EDE9FE" stroke="#7C3AED" stroke-width="2"/>
+<circle cx="227" cy="702" r="12" fill="#7C3AED"/><path d="M203 735 C207 713,247 713,251 735" fill="#7C3AED"/>
+<text x="227" y="780" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="18" font-weight="750" fill="#5B21B6" text-anchor="middle">Audience question</text>
+<rect x="420" y="245" width="1285" height="870" rx="28" fill="#F1F7FE" stroke="#2496ED" stroke-width="4"/>
+<rect x="420" y="245" width="1285" height="66" rx="27" fill="#E2F1FF"/>
+<use href="#logo-docker" x="450" y="258" width="38" height="38"/>
+<text x="500" y="282" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="23" font-weight="800" fill="#0B5FA5" text-anchor="start">Docker sbx microVM</text>
+<text x="500" y="303" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="500" fill="#42637D" text-anchor="start">separate Linux kernel · private filesystem · isolated network</text>
+<rect x="1418" y="262" width="250" height="32" rx="16" fill="#FFFFFF"/>
+<text x="1543.0" y="284" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="700" fill="#0B5FA5" text-anchor="middle">persistent and disposable</text>
+<rect x="465" y="345" width="330" height="120" rx="18" fill="#FFFFFF" stroke="#D5DEEA" stroke-width="2" filter="url(#shadow)"/>
+<rect x="465" y="345" width="8" height="120" rx="4" fill="#111827"/>
+<rect x="489" y="367" width="56" height="56" rx="14" fill="#F6F8FB"/>
+<use href="#logo-opencode" x="499" y="377" width="36" height="36"/>
+<text x="561" y="388" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="21" font-weight="750" fill="#172033" text-anchor="start">OpenCode 1.18.31</text>
+<text x="561" y="415" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="450" fill="#536176" text-anchor="start">local provider only</text>
+<text x="561" y="436" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="450" fill="#536176" text-anchor="start">read-only workshop agent</text>
+<rect x="845" y="345" width="330" height="120" rx="18" fill="#FFFFFF" stroke="#D5DEEA" stroke-width="2" filter="url(#shadow)"/>
+<rect x="845" y="345" width="8" height="120" rx="4" fill="#F59E0B"/>
+<text x="871" y="388" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="21" font-weight="750" fill="#172033" text-anchor="start">sbx network policy</text>
+<text x="871" y="415" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="450" fill="#536176" text-anchor="start">allow host Ollama only</text>
+<text x="871" y="436" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="450" fill="#536176" text-anchor="start">deny other outbound traffic</text>
+<path d="M892 387 l18 -14 18 14 v20 c0 15 -12 25 -18 28 -6 -3 -18 -13 -18 -28z" fill="#FFF4D6" stroke="#D97706" stroke-width="2"/><path d="M902 402 l6 6 12 -14" fill="none" stroke="#D97706" stroke-width="3"/>
+<rect x="1225" y="345" width="420" height="120" rx="18" fill="#FFFFFF" stroke="#D5DEEA" stroke-width="2" filter="url(#shadow)"/>
+<rect x="1225" y="345" width="8" height="120" rx="4" fill="#2496ED"/>
+<rect x="1249" y="367" width="56" height="56" rx="14" fill="#F6F8FB"/>
+<use href="#logo-docker" x="1259" y="377" width="36" height="36"/>
+<text x="1321" y="388" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="21" font-weight="750" fill="#172033" text-anchor="start">Private Docker daemon</text>
+<text x="1321" y="415" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="450" fill="#536176" text-anchor="start">Compose builds and runs the data stack</text>
+<text x="1321" y="436" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="450" fill="#536176" text-anchor="start">no host Docker socket shared</text>
+<path d="M795 405 L845 405" fill="none" stroke="#8B5CF6" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow-gray)"/>
+<path d="M1175 405 L1225 405" fill="none" stroke="#2496ED" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow-docker)"/>
+<rect x="465" y="505" width="1180" height="535" rx="24" fill="#FFFFFF" stroke="#6DAFE6" stroke-width="2" stroke-dasharray="10 7"/>
+<use href="#logo-docker" x="492" y="523" width="31" height="31"/>
+<text x="536" y="547" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="19" font-weight="800" fill="#1565C0" text-anchor="start">Docker Compose data plane</text>
+<text x="795" y="547" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="500" fill="#536176" text-anchor="start">private data network · hardened containers · named volumes</text>
+<rect x="500" y="582" width="120" height="32" rx="16" fill="#E8F2FF"/>
+<text x="560.0" y="604" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="700" fill="#1565C0" text-anchor="middle">INGEST</text>
+<rect x="500" y="630" width="265" height="120" rx="18" fill="#FFFFFF" stroke="#D5DEEA" stroke-width="2" filter="url(#shadow)"/>
+<rect x="500" y="630" width="8" height="120" rx="4" fill="#3776AB"/>
+<rect x="524" y="652" width="56" height="56" rx="14" fill="#F6F8FB"/>
+<use href="#logo-python" x="534" y="662" width="36" height="36"/>
+<text x="596" y="673" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="21" font-weight="750" fill="#172033" text-anchor="start">PDF ingestion job</text>
+<text x="596" y="700" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="450" fill="#536176" text-anchor="start">extract pages · validate metadata</text>
+<text x="596" y="721" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="450" fill="#536176" text-anchor="start">chunk with stable citation IDs</text>
+<rect x="825" y="630" width="260" height="120" rx="18" fill="#FFFFFF" stroke="#D5DEEA" stroke-width="2" filter="url(#shadow)"/>
+<rect x="825" y="630" width="8" height="120" rx="4" fill="#111827"/>
+<rect x="849" y="652" width="56" height="56" rx="14" fill="#F6F8FB"/>
+<use href="#logo-ollama" x="859" y="662" width="36" height="36"/>
+<text x="921" y="673" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="21" font-weight="750" fill="#172033" text-anchor="start">Local embeddings</text>
+<text x="921" y="700" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="450" fill="#536176" text-anchor="start">nomic-embed-text:v1.5</text>
+<text x="921" y="721" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="450" fill="#536176" text-anchor="start">document vectors via Ollama</text>
+<rect x="1160" y="633" width="200" height="110" fill="#FFFFFF" stroke="#DC244C" stroke-width="2"/>
+<ellipse cx="1260.0" cy="633" rx="100.0" ry="15" fill="#FFFFFF" stroke="#DC244C" stroke-width="2"/>
+<ellipse cx="1260.0" cy="743" rx="100.0" ry="15" fill="#FFFFFF" stroke="#DC244C" stroke-width="2"/>
+<use href="#logo-qdrant" x="1178" y="654" width="38" height="38"/>
+<text x="1226" y="676" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="19" font-weight="750" fill="#172033" text-anchor="start">Qdrant</text>
+<text x="1260.0" y="702" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="13" font-weight="500" fill="#536176" text-anchor="middle">vectors + passages</text>
+<rect x="1415" y="633" width="185" height="110" fill="#FFFFFF" stroke="#003B57" stroke-width="2"/>
+<ellipse cx="1507.5" cy="633" rx="92.5" ry="15" fill="#FFFFFF" stroke="#003B57" stroke-width="2"/>
+<ellipse cx="1507.5" cy="743" rx="92.5" ry="15" fill="#FFFFFF" stroke="#003B57" stroke-width="2"/>
+<use href="#logo-sqlite" x="1433" y="654" width="38" height="38"/>
+<text x="1481" y="676" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="19" font-weight="750" fill="#172033" text-anchor="start">SQLite</text>
+<text x="1507.5" y="702" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="13" font-weight="500" fill="#536176" text-anchor="middle">catalog + rows</text>
+<path d="M765 690 L825 690" fill="none" stroke="#2F80ED" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M1085 690 L1160 690" fill="none" stroke="#2F80ED" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M765 716 L830 716 L830 780 L1508 780 L1508 758" fill="none" stroke="#2F80ED" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M370 494 L395 494 L395 668 L500 668" fill="none" stroke="#2F80ED" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<path d="M955 750 L955 795 L395 795 L395 878 L370 878" fill="none" stroke="#F59E0B" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-orange)"/>
+<path d="M370 920 L420 920 L420 785 L1005 785 L1005 750" fill="none" stroke="#F59E0B" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="8 6" marker-end="url(#arrow-orange)"/>
+<rect x="500" y="817" width="120" height="32" rx="16" fill="#F1EAFE"/>
+<text x="560.0" y="839" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="700" fill="#6D28D9" text-anchor="middle">QUERY</text>
+<rect x="500" y="860" width="305" height="125" rx="18" fill="#FFFFFF" stroke="#D5DEEA" stroke-width="2" filter="url(#shadow)"/>
+<rect x="500" y="860" width="8" height="125" rx="4" fill="#6D28D9"/>
+<rect x="524" y="882" width="56" height="56" rx="14" fill="#F6F8FB"/>
+<use href="#logo-modelcontextprotocol" x="534" y="892" width="36" height="36"/>
+<text x="596" y="903" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="21" font-weight="750" fill="#172033" text-anchor="start">MCP server</text>
+<text x="596" y="930" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="450" fill="#536176" text-anchor="start">5 bounded, read-only tools</text>
+<text x="596" y="951" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="450" fill="#536176" text-anchor="start">HTTP streamable transport</text>
+<rect x="865" y="860" width="290" height="125" rx="18" fill="#FFFFFF" stroke="#D5DEEA" stroke-width="2" filter="url(#shadow)"/>
+<rect x="865" y="860" width="8" height="125" rx="4" fill="#3776AB"/>
+<rect x="889" y="882" width="56" height="56" rx="14" fill="#F6F8FB"/>
+<use href="#logo-python" x="899" y="892" width="36" height="36"/>
+<text x="961" y="903" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="21" font-weight="750" fill="#172033" text-anchor="start">Retrieval service</text>
+<text x="961" y="930" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="450" fill="#536176" text-anchor="start">validate arguments · exact filters</text>
+<text x="961" y="951" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="450" fill="#536176" text-anchor="start">semantic search · pagination</text>
+<rect x="1215" y="860" width="385" height="125" rx="18" fill="#FFFFFF" stroke="#D5DEEA" stroke-width="2" filter="url(#shadow)"/>
+<rect x="1215" y="860" width="8" height="125" rx="4" fill="#0F9D77"/>
+<text x="1241" y="903" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="21" font-weight="750" fill="#172033" text-anchor="start">Evidence response</text>
+<text x="1241" y="930" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="450" fill="#536176" text-anchor="start">passage + document ID + page</text>
+<text x="1241" y="951" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="450" fill="#536176" text-anchor="start">score is similarity, not confidence</text>
+<path d="M805 922 L865 922" fill="none" stroke="#6D28D9" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow-purple)"/>
+<path d="M1155 900 L1190 900 L1190 704 L1160 704" fill="none" stroke="#6D28D9" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-purple)"/>
+<path d="M1155 945 L1385 945 L1385 704 L1415 704" fill="none" stroke="#6D28D9" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-purple)"/>
+<path d="M1155 922 L1215 922" fill="none" stroke="#0F9D77" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow-green)"/>
+<path d="M630 465 L630 815 L652 815 L652 860" fill="none" stroke="#6D28D9" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-purple)"/>
+<path d="M269 716 L405 716 L405 405 L465 405" fill="none" stroke="#6D28D9" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-purple)"/>
+<path d="M465 430 L395 430 L395 850 L370 850" fill="none" stroke="#F59E0B" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-orange)"/>
+<path d="M1408 985 L1408 1065 L740 1065 L740 465" fill="none" stroke="#0F9D77" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-green)"/>
+<rect x="85" y="1050" width="285" height="78" rx="18" fill="#EAFBF5" stroke="#0F9D77" stroke-width="2"/>
+<text x="227" y="1081" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="20" font-weight="800" fill="#087A55" text-anchor="middle">Cited local answer</text>
+<text x="227" y="1107" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="500" fill="#315B50" text-anchor="middle">document ID + page evidence</text>
+<path d="M500 1082 L370 1082" fill="none" stroke="#0F9D77" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-green)"/>
+<rect x="845" y="1062" width="800" height="46" rx="15" fill="#FFF1F1" stroke="#E35D6A" stroke-width="2"/>
+<text x="875" y="1092" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="16" font-weight="750" fill="#A12A36" text-anchor="start">✕  Hosted LLMs, external APIs, telemetry, arbitrary web access</text>
+<path d="M1100 465 L1100 490" fill="none" stroke="#E35D6A" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="6 5"/>
+<circle cx="392" cy="668" r="16" fill="#2F80ED" stroke="#FFFFFF" stroke-width="3"/>
+<text x="392" y="673" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="13" font-weight="800" fill="#FFFFFF" text-anchor="middle">1</text>
+<circle cx="790" cy="690" r="16" fill="#2F80ED" stroke="#FFFFFF" stroke-width="3"/>
+<text x="790" y="695" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="13" font-weight="800" fill="#FFFFFF" text-anchor="middle">2</text>
+<circle cx="395" cy="830" r="16" fill="#F59E0B" stroke="#FFFFFF" stroke-width="3"/>
+<text x="395" y="835" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="13" font-weight="800" fill="#FFFFFF" text-anchor="middle">4</text>
+<circle cx="404" cy="405" r="16" fill="#6D28D9" stroke="#FFFFFF" stroke-width="3"/>
+<text x="404" y="410" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="13" font-weight="800" fill="#FFFFFF" text-anchor="middle">3</text>
+<circle cx="630" cy="800" r="16" fill="#6D28D9" stroke="#FFFFFF" stroke-width="3"/>
+<text x="630" y="805" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="13" font-weight="800" fill="#FFFFFF" text-anchor="middle">5</text>
+<circle cx="1188" cy="922" r="16" fill="#0F9D77" stroke="#FFFFFF" stroke-width="3"/>
+<text x="1188" y="927" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="13" font-weight="800" fill="#FFFFFF" text-anchor="middle">6</text>
+<circle cx="740" cy="1045" r="16" fill="#0F9D77" stroke="#FFFFFF" stroke-width="3"/>
+<text x="740" y="1050" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="13" font-weight="800" fill="#FFFFFF" text-anchor="middle">7</text>
+<circle cx="390" cy="1082" r="16" fill="#0F9D77" stroke="#FFFFFF" stroke-width="3"/>
+<text x="390" y="1087" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="13" font-weight="800" fill="#FFFFFF" text-anchor="middle">8</text>
+<rect x="45" y="1178" width="1710" height="30" rx="12" fill="#172033"/>
+<line x1="75" y1="1193" x2="109" y2="1193" stroke="#2F80ED" stroke-width="5" stroke-linecap="round"/>
+<text x="120" y="1198" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="650" fill="#FFFFFF" text-anchor="start">document + data flow</text>
+<line x1="340" y1="1193" x2="374" y2="1193" stroke="#F59E0B" stroke-width="5" stroke-linecap="round"/>
+<text x="385" y="1198" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="650" fill="#FFFFFF" text-anchor="start">local model call</text>
+<line x1="590" y1="1193" x2="624" y2="1193" stroke="#6D28D9" stroke-width="5" stroke-linecap="round"/>
+<text x="635" y="1198" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="650" fill="#FFFFFF" text-anchor="start">MCP tool loop</text>
+<line x1="805" y1="1193" x2="839" y2="1193" stroke="#0F9D77" stroke-width="5" stroke-linecap="round"/>
+<text x="850" y="1198" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="650" fill="#FFFFFF" text-anchor="start">evidence + answer</text>
+<line x1="1065" y1="1193" x2="1099" y2="1193" stroke="#E35D6A" stroke-width="5" stroke-linecap="round"/>
+<text x="1110" y="1198" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="650" fill="#FFFFFF" text-anchor="start">blocked egress</text>
+<text x="1718" y="1198" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="13" font-weight="600" fill="#AEBACB" text-anchor="end">privacy-first-search-lab</text>
+</svg>

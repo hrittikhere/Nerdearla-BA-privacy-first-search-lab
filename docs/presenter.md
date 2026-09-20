@@ -9,7 +9,7 @@
   model downloads, or container builds should be needed during presentation.
 - Run one semantic query and one model request to warm caches. Stop unrelated
   heavyweight inference jobs. Keep the 3B/16K configuration for the dry run.
-- Open the README architecture diagram, an agreement PDF, and two terminals:
+- Open the README's numbered end-to-end workflow diagram, an agreement PDF, and two terminals:
   the walkthrough and `sbx`/policy logs.
 - Use a large terminal font. Keep `.local/` transcripts off shared/public screens
   if attendees substitute private data later.
@@ -20,7 +20,7 @@
 
 | Minutes | Activity | Audience takeaway |
 |---|---|---|
-| 0–5 | Follow one question across the architecture diagram | “Local” is a property of every data hop |
+| 0–5 | Follow steps 3–8 across the workflow diagram | “Local” is a property of every data hop |
 | 5–10 | Inspect the fictional corpus and page provenance | Evidence precedes embeddings |
 | 10–18 | Parse, chunk, inspect one chunk, explain embeddings | Chunk boundaries trade context for precision |
 | 18–25 | Semantic clause search and exact portfolio filters | Top-k search cannot establish exhaustive coverage |
