@@ -6,23 +6,56 @@ import re
 import subprocess
 import time
 
-from workshop import ROOT, SBX, STATE, local_env
+from workshop import ROOT, SBX, STATE, local_env, sandbox_exec, warm_models
 
 PROMPT = (
     'Use loans_search_documents with query "fees and voluntary prepayment", '
     'document_id "DEMO-LA-2026-001", limit 3. After the tool result, return exactly two lines: '
     "line 1 is \"The borrower may prepay on a scheduled due date after paying that date's "
     'scheduled installment." and line 2 is "DEMO-LA-2026-001, page 2". '
-    "Do not add another sentence or infer a notice period."
+    "Do not add another sentence or infer a notice period. Do not echo the tool result."
 )
 EXPECTED = "The borrower may prepay on a scheduled due date after paying that date's scheduled installment."
 JURISDICTION_PROMPT = (
     'Use loans_search_documents with query "governing law dispute forum jurisdiction", '
     'document_id "DEMO-LA-2026-001", limit 3. After the tool result, return exactly two lines: '
     'line 1 is "Governing law and dispute forum are intentionally not designated." and '
-    'line 2 is "DEMO-LA-2026-001, page 2". Do not add another sentence or jurisdiction.'
+    'line 2 is "DEMO-LA-2026-001, page 2". Do not add another sentence or jurisdiction. '
+    "Do not echo the tool result."
 )
 JURISDICTION_EXPECTED = "Governing law and dispute forum are intentionally not designated."
+# The small model intermittently answers from the prompt without calling the tool.
+ATTEMPTS = 3
+
+
+def decode(stream):
+    """subprocess reports partial output as bytes on timeout, even under text=True."""
+    if stream is None:
+        return ""
+    return stream.decode(errors="replace") if isinstance(stream, bytes) else stream
+
+
+def launch(command, args, cap):
+    """Run the harness once. Exceeding the cap is a failed check, not a crash."""
+    try:
+        done = subprocess.run(
+            command,
+            cwd=ROOT,
+            env=local_env() if args.local else None,
+            # sbx forwards stdin as a pipe even when the presenter uses a terminal.
+            # OpenCode reads that pipe to EOF before it submits the argv prompt.
+            # Give this noninteractive run EOF immediately instead of waiting for
+            # the harness timeout to close sbx and finally release the prompt.
+            stdin=subprocess.DEVNULL,
+            text=True,
+            capture_output=True,
+            timeout=cap,
+        )
+        return done.stdout, done.stderr, done.returncode, False
+    except subprocess.TimeoutExpired as exc:
+        # Keep the partial transcript: it shows how far the harness got.
+        print(f"Harness exceeded its {cap}s cap. Reporting the partial transcript.")
+        return decode(exc.stdout), decode(exc.stderr), None, True
 
 
 def assess(events, expected=EXPECTED):
@@ -76,18 +109,38 @@ def main():
         if args.local
         else ["sbx", "exec", "-w", str(ROOT), SBX] + harness
     )
+    warm_models()
+    if not args.local:
+        # An idle sandbox stops and loses its Compose services. The agent's MCP call
+        # would then hang until the timeout, so restore them before timing anything.
+        sandbox_exec(["docker", "compose", "up", "-d", "--wait"])
+        # Container health is not the same as a reachable endpoint. A harness that
+        # starts too early sees no tools and answers from the prompt alone.
+        for _ in range(30):
+            probe = sandbox_exec(
+                ["curl", "--fail", "--silent", "--max-time", "5", "http://127.0.0.1:8765/health"],
+                capture=True,
+                check=False,
+            )
+            if probe.returncode == 0:
+                break
+            time.sleep(2)
+        else:
+            raise RuntimeError("MCP endpoint did not answer inside the sandbox")
+    cap = 150 if args.local else 300
     started = time.monotonic()
-    result = subprocess.run(
-        command,
-        cwd=ROOT,
-        env=local_env() if args.local else None,
-        text=True,
-        capture_output=True,
-        timeout=150,
-    )
-    (STATE / f"rehearsal-{args.case}.jsonl").write_text(result.stdout)
-    (STATE / f"rehearsal-{args.case}.stderr").write_text(result.stderr)
-    events = [json.loads(line) for line in result.stdout.splitlines() if line.startswith("{")]
+    # Retry only the skipped-tool-call flake, so a rehearsal reports the harness
+    # rather than the dice. A timeout is never retried: it would multiply the cap.
+    for attempt in range(1, ATTEMPTS + 1):
+        stdout, stderr, exit_code, timed_out = launch(command, args, cap)
+        events = [json.loads(line) for line in stdout.splitlines() if line.startswith("{")]
+        report = assess(events, expected)
+        report["passed"] = report["passed"] and exit_code == 0
+        if report["passed"] or timed_out or attempt == ATTEMPTS:
+            break
+        print(f"Attempt {attempt}/{ATTEMPTS} produced no verified answer; retrying.")
+    (STATE / f"rehearsal-{args.case}.jsonl").write_text(stdout)
+    (STATE / f"rehearsal-{args.case}.stderr").write_text(stderr)
     for event in events:
         if event.get("type") == "tool_use":
             part = event["part"]
@@ -95,15 +148,15 @@ def main():
             print("TOOL RESULT:", part["state"].get("output", part["state"].get("error")))
         elif event.get("type") == "text":
             print("MODEL RESPONSE:", event["part"]["text"])
-    report = assess(events, expected)
     report.update(
         seconds=round(time.monotonic() - started, 2),
-        exit_code=result.returncode,
+        exit_code=exit_code,
+        timed_out=timed_out,
+        attempts=attempt,
         mode="local" if args.local else "sbx",
-        model="Llama 3.2 3B / 16K context",
+        model="Gemma 4 E2B IT / 16K context",
         case=args.case,
     )
-    report["passed"] = report["passed"] and result.returncode == 0
     (STATE / f"rehearsal-{args.case}-report.json").write_text(json.dumps(report, indent=2) + "\n")
     print(json.dumps(report, indent=2))
     return 0 if report["passed"] else 1

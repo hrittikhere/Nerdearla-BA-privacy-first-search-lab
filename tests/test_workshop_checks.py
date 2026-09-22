@@ -1,4 +1,5 @@
 import importlib.util
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -30,7 +31,6 @@ def test_policy_audit_rejects_extra_or_unknown_allowances():
 def test_rehearsal_requires_real_tool_evidence_and_matching_answer():
     rehearsal = module("rehearse")
     expected = rehearsal.EXPECTED
-    import json
 
     call = {
         "type": "tool_use",
@@ -47,6 +47,44 @@ def test_rehearsal_requires_real_tool_evidence_and_matching_answer():
         "part": {"text": "Requires 15 days' notice. DEMO-LA-2026-001, page 2"},
     }
     assert not rehearsal.assess([call, invented])["passed"]
+
+
+@pytest.mark.parametrize("local", [False, True], ids=["sandbox", "local"])
+def test_rehearsal_submits_prompt_without_waiting_for_presenter_stdin(local):
+    # Keep the presenter's pipe open throughout launch. A harness that reads
+    # inherited stdin to EOF would otherwise wait until the rehearsal cap.
+    script = """
+import json
+import sys
+from types import SimpleNamespace
+
+sys.path.insert(0, sys.argv[1])
+from rehearse import launch
+
+result = launch(
+    [sys.executable, "-c", "import sys; print('prompt submitted' + sys.stdin.read())"],
+    SimpleNamespace(local=sys.argv[2] == "local"),
+    cap=1,
+)
+print(json.dumps(result))
+"""
+    process = subprocess.Popen(
+        [sys.executable, "-c", script, str(Path("scripts").resolve()), "local" if local else "sbx"],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    try:
+        process.wait(timeout=5)
+        # communicate() closes stdin, so call it only after the child has exited.
+        stdout, stderr = process.communicate()
+    finally:
+        if process.poll() is None:
+            process.kill()
+            process.communicate()
+    assert process.returncode == 0, stderr
+    assert json.loads(stdout.splitlines()[-1]) == ["prompt submitted\n", "", 0, False]
 
 
 def test_sbx_login_runs_device_flow_and_verifies_it(monkeypatch):

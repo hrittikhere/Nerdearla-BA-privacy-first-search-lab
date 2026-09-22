@@ -1,29 +1,38 @@
 # Model references
 
-The workshop's generation reference is
-**[Gemma 4 E4B IT — `google/gemma-4-E4B-it`](https://huggingface.co/google/gemma-4-E4B-it)**.
-Use this name in the architecture, diagram, and presentation when discussing
-local generation and tool selection. The corpus embedding model remains
-`nomic-embed-text:v1.5`.
+The workshop's generation model is
+**[Gemma 4 E2B IT](https://huggingface.co/google/gemma-4-E2B-it)**, pulled from
+Ollama as `gemma4:e2b`. Use this name in the architecture, diagram, and
+presentation when discussing local generation and tool selection. The corpus
+embedding model remains `nomic-embed-text:v1.5`.
 
-## Reference versus runnable setup
+## Runnable setup
 
 | Item | Model or setting |
 |---|---|
-| Documentation and diagram | Gemma 4 E4B IT |
-| Existing executable generation model | Llama 3.2 3B (`llama3.2:latest`) |
-| Existing OpenCode model alias | `privacy-lab-local` |
-| Existing demo context / output budget | 16,384 / 2,048 tokens |
+| Documentation and diagram | Gemma 4 E2B IT |
+| Executable generation model | Gemma 4 E2B IT (`gemma4:e2b`) |
+| OpenCode model alias | `privacy-lab-local` |
+| Demo context / output budget | 16,384 / 2,048 tokens |
 | Document and query embeddings | `nomic-embed-text:v1.5` |
 
-This is a documentation update. It does not download weights, change the
-[Modelfile](Modelfile), change [OpenCode configuration](../opencode.json), or
-re-run the sandbox and model rehearsals. `./workshop prepare` retains its
-existing behavior. Recorded timings and tool-call results in the
-[verification record](../docs/verification.md) refer to the model used in those
-runs, not to Gemma.
+Documentation and runtime now name the same generation model. `./workshop
+prepare` pulls `gemma4:e2b`, then builds the `privacy-lab-local` alias from
+[the Modelfile](Modelfile), which fixes the demo context at 16,384 tokens and
+temperature at zero. [OpenCode configuration](../opencode.json) selects that
+alias through the local provider.
 
-The Hugging Face repository identifies the reference model; it is not an Ollama
-model tag. A runtime migration would require selecting a compatible local build,
-updating model preparation and harness metadata, and rehearsing actual MCP calls
-and citation checks with that build.
+The Hugging Face repository identifies the reference weights; `gemma4:e2b` is the
+Ollama tag that serves them locally, and it is the instruction-tuned build
+([`google/gemma-4-E2B-it`](https://huggingface.co/google/gemma-4-E2B-it)) rather than
+the base model, because the workshop needs tool selection. E2B is the "effective 2B"
+edge build of Gemma 4: roughly 5.1B stored parameters at Q4_K_M, about 7.2 GB on disk.
+Budget download time and unified memory accordingly.
+
+Changing the generation model does not invalidate the index: only the embedding
+model identity and digest are recorded in it. Changing the embedding model or
+the parser still requires a fresh index.
+
+Timings and tool-call results in the [verification record](../docs/verification.md)
+state which model produced them. Temperature zero is not a guarantee of
+factuality or identical output, and tool-call reliability differs between models.

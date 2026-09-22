@@ -129,9 +129,9 @@ Read the [architecture](docs/architecture.md), [sbx guide](docs/sandbox.md), and
 
 | Mode | Search storage | What it exercises | Current evidence |
 |---|---|---|---|
-| `./workshop prepare --local` | SQLite catalog and SQLite cosine scan | Fast ingestion, retrieval, MCP, and OpenCode rehearsal on the host | Verified with the full corpus and small model |
+| `./workshop prepare --local` | SQLite catalog and SQLite cosine scan | Fast ingestion, retrieval, MCP, and OpenCode rehearsal on the host | Verified with the full corpus and Gemma 4 E2B IT on 22 September 2026 |
 | Standalone Docker Compose | Qdrant plus SQLite catalog in service volumes | Container packaging, Qdrant, and HTTP MCP on Docker Desktop | Verified; see [commands](docs/operations.md#standalone-container-validation) |
-| `./workshop prepare` | Qdrant plus SQLite catalog inside sbx | Intended workshop architecture with microVM and egress policy | Verified with sbx 0.43.0, the full corpus, MCP, and small model |
+| `./workshop prepare` | Qdrant plus SQLite catalog inside sbx | Intended workshop architecture with microVM and egress policy | Verified with sbx 0.43.0, the full corpus, and MCP; last generation-model rehearsal there used Llama 3.2 3B |
 
 All modes share the same parser, retrieval service, and MCP tool contract. Local
 mode has no sandbox containment. Running Compose on Docker Desktop also does not
@@ -151,15 +151,15 @@ establish that the sbx network policy works.
 Linux and Windows/WSL have not been rehearsed here. Prepare downloads before the
 session; first-run setup time depends on your connection and cache state.
 
-| Model role | Reference / setting | Reason |
+| Model role | Model / setting | Reason |
 |---|---|---|
-| Generation and tool selection | **[Gemma 4 E4B IT](https://huggingface.co/google/gemma-4-E4B-it)** | Workshop reference for local generation and tool selection |
-| Existing demo context | **16,384 tokens**, up to 2,048 output tokens | A runtime setting, not the reference model's maximum context |
+| Generation and tool selection | **[Gemma 4 E2B IT](https://huggingface.co/google/gemma-4-E2B-it)** (`gemma4:e2b`) | Local generation and tool selection |
+| Demo context | **16,384 tokens**, up to 2,048 output tokens | A runtime setting, not the model's maximum context |
 | Embeddings | **nomic-embed-text:v1.5** | Same local model for document and query vectors |
 
-The documentation and diagram use Gemma 4 E4B IT as the generation reference.
-The executable setup remains on Llama 3.2 3B; this reference update does not
-install or rehearse Gemma. See [model references](models/README.md) for the distinction.
+Documentation, diagram, and runtime all use Gemma 4 E2B IT. `./workshop prepare`
+pulls `gemma4:e2b` (about 7.2 GB) and builds the `privacy-lab-local` alias from
+it. See [model references](models/README.md) for the download and memory budget.
 
 [The Modelfile](models/Modelfile) sets the generation context and temperature zero.
 [OpenCode configuration](opencode.json) selects the local provider and workshop
@@ -221,6 +221,16 @@ the sandbox, builds the service image, starts Compose, and ingests the corpus.
 It does not reset an existing global sandbox policy. `privacy-check` verifies the
 effective rules, local inference access, blocked external requests from both the
 agent and service container, retrieval after the denial, and the policy log.
+
+`doctor` is the demo's first step, and it now runs `prepare` itself when the named
+sandbox does not exist, so `./workshop demo` no longer fails at step 1 on a fresh
+machine. That path needs the network and several minutes, so run it before the
+session rather than on stage.
+
+`privacy-check` only passes when the global sbx policy is `deny-all`. A machine whose
+policy was initialized as `balanced` keeps roughly 180 external allowances, and the
+audit correctly refuses to certify it. Preparation never resets that global policy for
+you; changing it affects every sandbox on the host.
 
 ### Endpoints and local state
 
@@ -434,7 +444,9 @@ automatic compliance decisions. See [security and scope](SECURITY.md).
 The [verification record](docs/verification.md) separates executed checks from
 their limits. The recorded baseline includes **24 automated tests**, all 40 PDFs,
 six corpus acceptance checks on both backends, real MCP handshakes, actual sbx
-policy probes, and two successful small-model quotation rehearsals in the sandbox.
+policy probes, and quotation rehearsals in the sandbox. Local-mode runs with
+Gemma 4 E2B IT are recorded separately, including one run in which the model
+answered without calling the tool and the gate stopped the demo.
 
 Run code and protocol checks without downloading the corpus or models:
 

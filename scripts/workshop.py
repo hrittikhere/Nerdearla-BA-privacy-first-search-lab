@@ -18,6 +18,7 @@ STATE = ROOT / ".local"
 SBX = "privacy-search-lab"
 OLLAMA = "http://127.0.0.1:11435"
 MODEL = "privacy-lab-local"
+GENERATION = "gemma4:e2b"
 EMBED = "nomic-embed-text:v1.5"
 OPENCODE_VERSION = "1.18.31"
 SOURCE = ROOT / "data/source"
@@ -123,6 +124,9 @@ def local_env():
         OPENCODE_DISABLE_DEFAULT_PLUGINS="true",
         OPENCODE_DISABLE_LSP_DOWNLOAD="true",
         OPENCODE_DISABLE_CLAUDE_CODE="true",
+        # A workshop model must not unload between demo steps: reloading 7 GB from
+        # disk mid-presentation can exceed the rehearsal timeout.
+        OLLAMA_KEEP_ALIVE="-1",
     )
     # Keep workshop harness configuration and conversations separate from user settings.
     for key, directory in [
@@ -169,10 +173,26 @@ def models_start():
     print("Workshop Ollama is local-only on 127.0.0.1:11435.")
 
 
+def warm_models():
+    """Load both models before anything is timed. A cold load is not a demo step."""
+    for path, body in [
+        ("/api/chat", {"model": MODEL, "messages": [], "keep_alive": -1}),
+        ("/api/embed", {"model": EMBED, "input": "warm", "keep_alive": -1}),
+    ]:
+        request = urllib.request.Request(
+            OLLAMA + path,
+            data=json.dumps(body).encode(),
+            headers={"Content-Type": "application/json"},
+        )
+        with urllib.request.urlopen(request, timeout=600) as response:
+            response.read()
+    print("Generation and embedding models are resident and pinned.")
+
+
 def models_prepare():
     models_start()
     names = {m["name"] for m in get_json(OLLAMA + "/api/tags")["models"]}
-    for name in [EMBED, "llama3.2:latest"]:
+    for name in [EMBED, GENERATION]:
         if name not in names:
             run(["ollama", "pull", name], env=local_env())
     run(["ollama", "create", MODEL, "-f", "models/Modelfile"], env=local_env())
@@ -198,14 +218,35 @@ def sandbox_exec(args, *, capture=False, check=True, tty=False):
     return run(command + ["-w", str(ROOT), SBX] + list(args), capture=capture, check=check)
 
 
+_services_ready = False
+
+
+def ensure_services():
+    """Restore the cached services before any step that talks to them.
+
+    A sandbox VM or its private Docker daemon can stop between sessions, and its
+    containers do not come back on their own. Resuming at a later demo step must
+    not depend on step 1 having run in this process.
+    """
+    global _services_ready
+    if _services_ready:
+        return
+    sandbox_exec(["docker", "compose", "up", "-d", "--wait"])
+    _services_ready = True
+
+
+def compose(args, *, capture=False, check=True):
+    """Run a compose command against services that are guaranteed to be up."""
+    ensure_services()
+    return sandbox_exec(["docker", "compose"] + list(args), capture=capture, check=check)
+
+
 def lab(args, local=False, *, capture=False):
     if local:
         return run(
             ["uv", "run", "--frozen", "privacy-lab"] + list(args), env=local_env(), capture=capture
         )
-    return sandbox_exec(
-        ["docker", "compose", "exec", "-T", "mcp", "privacy-lab"] + list(args), capture=capture
-    )
+    return compose(["exec", "-T", "mcp", "privacy-lab"] + list(args), capture=capture)
 
 
 def start_local_mcp():
@@ -305,8 +346,8 @@ def prepare(local=False):
             enabled.append(host)
         sandbox_exec(["docker", "compose", "build"])
         sandbox_exec(["docker", "compose", "pull", "qdrant"])
-        sandbox_exec(["docker", "compose", "up", "-d", "--wait"])
-        sandbox_exec(["docker", "compose", "run", "--rm", "ingest"])
+        ensure_services()
+        compose(["run", "--rm", "ingest"])
         current_opencode = sandbox_exec(["opencode", "--version"], capture=True)
         if current_opencode.stdout.strip() != OPENCODE_VERSION:
             sandbox_exec(
@@ -323,21 +364,41 @@ def prepare(local=False):
         sandbox_exec(["opencode", "models", "ollama"])
     finally:
         for host in enabled:
-            run(
-                ["sbx", "policy", "rm", "network", "--sandbox", SBX, "--resource", host],
+            # --force is required: sbx prompts for confirmation, and a non-interactive
+            # removal that silently fails would leave preparation egress in place.
+            removal = run(
+                ["sbx", "policy", "rm", "network", "--sandbox", SBX, "--resource", host, "--force"],
                 check=False,
             )
-    doctor(False)
+            if removal.returncode:
+                print(
+                    f"WARNING: preparation rule for {host} was not removed. "
+                    "Remove it manually and rerun ./workshop privacy-check before presenting."
+                )
+    doctor(False, create=False)
 
 
-def doctor(local=False):
+def doctor(local=False, create=True):
     status = get_json(OLLAMA + "/api/status")
     if status.get("cloud", {}).get("disabled") is not True:
         raise RuntimeError("Workshop Ollama cloud-disable check failed")
+    warm_models()
     if not local:
-        # A sandbox VM or its private Docker daemon can restart between rehearsal
-        # sessions. Restore the cached services before checking their state.
-        sandbox_exec(["docker", "compose", "up", "-d", "--wait"])
+        sandboxes, detail = sbx_state()
+        if sandboxes is None:
+            raise RuntimeError(f"Docker sbx preflight failed: {detail}")
+        if not sandbox_exists(sandboxes):
+            if not create:
+                raise RuntimeError(f"Sandbox {SBX} is still missing after preparation")
+            # Preparation downloads images and ingests the corpus. It temporarily
+            # permits registry egress, so it is setup work, not a presentation step.
+            print(
+                f"Sandbox {SBX} does not exist. Running ./workshop prepare to create it; "
+                "this needs the network and takes several minutes."
+            )
+            prepare(False)
+            return
+        ensure_services()
     result = lab(["status"], local, capture=True)
     data = json.loads(result.stdout)
     print(json.dumps(data, indent=2))
@@ -350,7 +411,7 @@ def doctor(local=False):
         lab(["verify-sources", str(SOURCE)], True)
         print("PASS: local functional checks. Sandbox isolation has NOT been tested in this mode.")
     else:
-        sandbox_exec(["docker", "compose", "run", "--rm", "ingest", "verify-sources", "/corpus"])
+        compose(["run", "--rm", "ingest", "verify-sources", "/corpus"])
         run(["sbx", "policy", "ls", SBX, "--wide"])
         print("Functional checks passed. Run ./workshop privacy-check before presentation.")
 
@@ -393,9 +454,7 @@ def privacy_check(local=False):
     probe = "import urllib.request; urllib.request.urlopen('http://example.com', timeout=10)"
     # A failed request is necessary, but policy evidence above and logs below are also required.
     agent = sandbox_exec(["curl", "--fail", "--max-time", "10", "https://example.com"], check=False)
-    container = sandbox_exec(
-        ["docker", "compose", "exec", "-T", "mcp", "python", "-c", probe], check=False
-    )
+    container = compose(["exec", "-T", "mcp", "python", "-c", probe], check=False)
     if agent.returncode == 0 or container.returncode == 0:
         raise RuntimeError("External request succeeded; presentation isolation gate FAILED")
     lab(["search", "early repayment fees", "--document-id", "DEMO-LA-2026-001", "--limit", "1"])
@@ -415,9 +474,7 @@ def demo(local=False, start=1, auto=False):
         (
             "Re-ingest unchanged sources: demonstrate idempotence",
             lambda: (
-                lab(["ingest", str(SOURCE)], True)
-                if local
-                else sandbox_exec(["docker", "compose", "run", "--rm", "ingest"])
+                lab(["ingest", str(SOURCE)], True) if local else compose(["run", "--rm", "ingest"])
             ),
         ),
         (

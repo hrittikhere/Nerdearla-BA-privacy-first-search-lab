@@ -1,13 +1,17 @@
 # Presenter runbook: 60 minutes
 
-The presentation model reference is
-**[Gemma 4 E4B IT](https://huggingface.co/google/gemma-4-E4B-it)**. The existing
-runnable setup and recorded rehearsals use Llama 3.2 3B. Identify the actual
-running model when showing a live trace; see [model references](../models/README.md).
+The presentation model is
+**[Gemma 4 E2B IT](https://huggingface.co/google/gemma-4-E2B-it)**, served locally as
+`gemma4:e2b`. Older rehearsal records in the repository were produced with Llama 3.2 3B
+and are labelled as such. Identify the actual running model when showing a live trace;
+see [model references](../models/README.md).
 
 ## Before the room opens
 
-- Complete `./workshop prepare` with the actual sandbox, not only `--local`.
+- Complete `./workshop prepare` with the actual sandbox, not only `--local`. Step 1 of
+  the demo will create a missing sandbox, but that downloads images and takes minutes.
+- Confirm the global sbx policy is `deny-all`, or drop the isolation claim: the
+  `balanced` default makes `privacy-check` and step 10 fail.
 - Run `./workshop login` first if the Docker device session may have expired.
 - Run `./workshop doctor`, `./workshop privacy-check`, and the small-model rehearsal.
 - Check every effective allow rule and corresponding deny evidence. No npm, PyPI,
@@ -74,16 +78,19 @@ search hits are not exhaustive over the corpus.”
 “The source text is untrusted. A sentence inside a loan agreement cannot grant
 permission to execute a command.”
 
-“The model reference in the slides is Gemma 4 E4B IT. The recorded rehearsal used
-Llama 3.2 3B; those results do not establish Gemma performance or answer quality.”
+“The model in the slides is the model in the terminal: Gemma 4 E2B IT, running
+locally. Every number on screen came from a tool call you can read.”
 
 ## If something fails on stage
 
 | Failure | Recovery |
 |---|---|
-| Model is slow | Show the returned passages first; use the short exact-quote prompt and warmed local model |
+| Model is slow | Show the returned passages first; use the short exact-quote prompt and warmed local model. Local rehearsals ran about 22 seconds |
+| Model answers without calling the tool | Observed once in eleven local runs. The step fails by design: no evidence was retrieved. Say so plainly and rerun the step |
+| Model echoes the raw tool JSON before answering | Scroll to the two-line answer, name what happened, and rerun the step |
 | Model invents a claim | Compare it to the evidence openly; this is a grounding failure, not a reason to hide the trace |
 | Sandbox cannot start | Explain the limitation; use the clearly labeled local path for ingestion/MCP only |
+| Long pause between steps | An idle sandbox stops and loses its services. Steps 8 and 9 restore them by themselves, which adds around 30 seconds before the model answers |
 | Compose services exited between sessions | Run `./workshop doctor`; it restores cached services before checking them |
 | Harness prints a tool call as text | Rerun `./workshop prepare` to restore the pinned OpenCode version and provider cache |
 | External access succeeds | Stop the privacy claim and inspect effective allow rules |

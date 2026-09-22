@@ -8,10 +8,10 @@ also described in the [main workshop guide](../README.md#architecture-and-the-ro
 
 ## Model reference
 
-The diagram uses **[Gemma 4 E4B IT](https://huggingface.co/google/gemma-4-E4B-it)**
+The diagram and the runtime both use
+**[Gemma 4 E2B IT](https://huggingface.co/google/gemma-4-E2B-it)** (`gemma4:e2b`)
 for generation and tool selection. `nomic-embed-text:v1.5` remains the embedding
-model. This is the presentation reference; the executable setup has not been
-switched or rehearsed with Gemma. See [model references](../models/README.md).
+model. See [model references](../models/README.md) for the download and memory budget.
 
 ## Two flows, one local system
 

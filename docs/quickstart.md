@@ -65,11 +65,11 @@ policy before showing a privacy claim.
 ./workshop demo --local
 ```
 
-The workshop documentation references
-[Gemma 4 E4B IT](https://huggingface.co/google/gemma-4-E4B-it). The commands above
-still use the existing Llama 3.2 3B setup with a **16K demo context**; they do not
-install Gemma. See [model references](../models/README.md). Keep requests short
-and inspect evidence: a successful tool call does not guarantee a grounded answer.
+The commands above run
+[Gemma 4 E2B IT](https://huggingface.co/google/gemma-4-E2B-it) (`gemma4:e2b`) with a
+**16K demo context**. The first preparation downloads about 7.2 GB of weights, so
+run it before the session. See [model references](../models/README.md). Keep requests
+short and inspect evidence: a successful tool call does not guarantee a grounded answer.
 
 Use `./workshop opencode --local` for an interactive harness, or omit `--local`
 for the sandbox. No hosted-provider API key is required for this workshop.

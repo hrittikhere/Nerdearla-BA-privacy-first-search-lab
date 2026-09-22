@@ -74,6 +74,13 @@ do not add a permanent broad registry allowance.
 ship a different OpenCode release. Preparation pins 1.18.31 inside the sandbox
 and warms the Ollama provider package before closing preparation egress.
 
+**Step 8 or 9 times out with an empty transcript:** OpenCode reads non-terminal
+stdin until EOF, even when its prompt is supplied as an argument. In an interactive
+demo, sbx forwards an open input pipe, so the harness can wait without contacting
+the model. The rehearsal now supplies `stdin=subprocess.DEVNULL` to close that
+input immediately. Resume with `./workshop demo --from-step 8`; increasing the
+timeout does not fix an open input pipe.
+
 **Global policy is Balanced/Open:** the preparation script does not reset your
 global policy. Inspect `sbx policy ls privacy-search-lab --wide`. Configure the
 intended policy explicitly before making an isolation claim. Avoid disrupting
@@ -93,9 +100,9 @@ model sessions, and keep the sandbox at the configured 3 GiB. Do not raise conte
 to 100K+ during the dry run. Download size does not equal inference memory: KV
 cache and concurrent requests also consume RAM.
 
-The docs reference [Gemma 4 E4B IT](https://huggingface.co/google/gemma-4-E4B-it);
-the runtime still uses the existing model. See [model references](../models/README.md)
-before interpreting model names in traces or changing runtime settings.
+Docs and runtime both name [Gemma 4 E2B IT](https://huggingface.co/google/gemma-4-E2B-it)
+(`gemma4:e2b`, about 7.2 GB). See [model references](../models/README.md) before
+interpreting model names in traces or changing runtime settings.
 
 **Tensor size/load error in an old model:** `ollama show MODEL` can reveal an
 incompatible/corrupt model before inference. The initial machine's GPT-OSS weights
