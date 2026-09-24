@@ -37,7 +37,7 @@ global sandbox policy is retained by the workshop script.
 ## Clone and prepare
 
 ```bash
-git clone https://github.com/rudrakshkarpe/Nerdearla-BA-privacy-first-search-lab.git
+git clone https://github.com/hrittikhere/Nerdearla-BA-privacy-first-search-lab.git
 cd Nerdearla-BA-privacy-first-search-lab
 ./workshop login
 ./workshop prepare
@@ -50,7 +50,7 @@ Preparation starts a dedicated host Ollama process at `127.0.0.1:11435` with
 `OLLAMA_NO_CLOUD=1`. It shares your existing model files, but does not change your
 regular Ollama service at port 11434. `/api/status` must report cloud disabled.
 
-The script verifies authentication, downloads the corpus if absent, obtains the
+The script verifies authentication, uses the corpus committed in the repository, obtains the
 small language and embedding models, creates or reuses the sandbox, temporarily
 permits dependency destinations, pins OpenCode 1.18.31, builds the Compose
 services, indexes the corpus, and removes its preparation allow rules. Failures
@@ -88,11 +88,11 @@ zero. The model can vary its tool calls; the script does not fake them.
 
 ## Corpus availability
 
-The provided Drive folder is an inbound preparation source, not a runtime search
-dependency. The downloaded PDFs live under `data/source/` and stay out of Git and
-Docker build contexts. If automated Drive download fails, download the folder
-manually, extract it under `data/source/`, and run the inspect command in
-[the exercises](exercises.md). Do not add real private records to the public repo.
+The 40 fictional PDFs are committed under `data/source/dummy_loan_agreements_40/`, so the clone
+above already contains the full corpus and preparation skips the download. They
+stay out of Docker build contexts; Compose mounts them read-only. The original
+Drive folder is only a fallback when `data/source/` is empty. Run the inspect
+command in [the exercises](exercises.md) to check the corpus. Do not add real private records to the public repo.
 
 ## Before you announce “demo ready”
 

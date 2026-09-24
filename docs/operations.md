@@ -18,7 +18,7 @@ scripts/
 sandbox/spec.yaml  Credential-free kit and local model endpoint
 compose.yaml       Private database, MCP, and explicit ingestion container
 models/Modelfile    Small local generation model with bounded context
-data/source/       Downloaded PDFs; ignored by Git and Docker builds
+data/source/       Corpus; sample PDFs committed, other files ignored; excluded from Docker builds
 data/index/        Local development index; ignored by Git
 .local/            Local processes, harness install, logs, reports; ignored
 ```

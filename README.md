@@ -1,6 +1,6 @@
 # Privacy First Search Lab
 
-[![Code and protocol checks](https://github.com/rudrakshkarpe/Nerdearla-BA-privacy-first-search-lab/actions/workflows/checks.yml/badge.svg)](https://github.com/rudrakshkarpe/Nerdearla-BA-privacy-first-search-lab/actions/workflows/checks.yml)
+[![Code and protocol checks](https://github.com/hrittikhere/Nerdearla-BA-privacy-first-search-lab/actions/workflows/checks.yml/badge.svg)](https://github.com/hrittikhere/Nerdearla-BA-privacy-first-search-lab/actions/workflows/checks.yml)
 
 **Build a local document-search pipeline, expose it through MCP, and watch a small local model use it from OpenCode.**
 
@@ -177,7 +177,7 @@ requires a fresh index.
 Run the commands below from the repository root after installing the prerequisites.
 
 ```bash
-git clone https://github.com/rudrakshkarpe/Nerdearla-BA-privacy-first-search-lab.git
+git clone https://github.com/hrittikhere/Nerdearla-BA-privacy-first-search-lab.git
 cd Nerdearla-BA-privacy-first-search-lab
 ```
 
@@ -189,8 +189,8 @@ cd Nerdearla-BA-privacy-first-search-lab
 ./workshop demo --local
 ```
 
-Preparation starts the dedicated Ollama endpoint, downloads missing model files
-and the corpus, installs the locked Python dependencies, ingests the PDFs, installs
+Preparation starts the dedicated Ollama endpoint, downloads missing model files,
+reuses the corpus shipped in the repository, installs the locked Python dependencies, ingests the PDFs, installs
 the pinned local OpenCode harness, and starts the MCP server. The preflight checks
 cloud-disabled inference, corpus readiness, source hashes, and the MCP protocol.
 
@@ -240,7 +240,7 @@ you; changing it affects every sandbox on the host.
 | `127.0.0.1:8765/mcp` | MCP endpoint on the host in local mode, or inside the microVM in sbx mode |
 | `127.0.0.1:8765/health` | MCP service health in the same environment |
 | `qdrant:6333` | Compose-internal database; no database port published to the host |
-| `data/source/` | Downloaded PDFs, excluded from Git and Docker build contexts |
+| `data/source/` | Corpus PDFs; `data/source/dummy_loan_agreements_40/` is committed, everything else is ignored by Git; all of it is excluded from Docker build contexts |
 | `data/index/` | Local-mode catalog and vector index |
 | `.local/` | Process IDs, logs, harness installation, conversations, and rehearsal reports |
 | Compose volumes | Container-mode catalog and Qdrant storage |
@@ -251,7 +251,7 @@ Ollama process with cloud support enabled, preparation refuses to use it.
 
 ## Corpus and ingestion
 
-The supplied [Drive folder](https://drive.google.com/drive/folders/1hSegm8i5YgFJfEuHNIDEigXVIDf_5kjv)
+The repository ships the corpus in [`data/source/dummy_loan_agreements_40/`](data/source/dummy_loan_agreements_40/). It
 contains **40 fictional loan agreements** spanning five illustrative borrower
 groups: household, microbusiness, small business, midsize, and corporation.
 The corpus index declares the identities and agreements synthetic. These specimens
@@ -279,11 +279,13 @@ The importer is tailored to these specimens. Unsupported layouts, encrypted PDFs
 scanned/empty pages, oversized files, and invalid schedules fail visibly. OCR and
 arbitrary-contract extraction are extensions, not shipped features.
 
-PDFs are downloaded during preparation and kept outside Git. Public folder access
-does not grant redistribution rights; the repository ships a
-[provenance manifest](data/manifest.json) and independently authored test fixtures
-instead of the source PDFs. If Drive download fails, extract the folder manually
-under `data/source/`. See [data handling](data/README.md) and
+The 40 PDFs and their customer index are committed under `data/source/dummy_loan_agreements_40/`, so a fresh
+clone has the complete corpus and preparation skips the network download. The
+[provenance manifest](data/manifest.json) records each file's SHA-256, page count,
+and chunk count, and `verify-sources` checks the files against it. The original
+[Drive folder](https://drive.google.com/drive/folders/1hSegm8i5YgFJfEuHNIDEigXVIDf_5kjv)
+remains a fallback: `./workshop fetch` downloads it only when `data/source/` has no PDFs.
+Any other documents you place under `data/source/` stay ignored by Git. See [data handling](data/README.md) and
 [ingestion internals](docs/ingestion.md).
 
 ## Try the retrieval pipeline
@@ -426,7 +428,7 @@ the [audience exercises](docs/exercises.md) extend each stage.
 | Agent capabilities | Five retrieval tools; administrative changes remain explicit CLI operations |
 | Instructions inside PDFs | Treat source text and tool results as untrusted evidence; their contents cannot grant tool permissions |
 | Source traceability | File hashes, chunk IDs, page citations, and per-document readiness state |
-| Public repository hygiene | PDFs, indexes, logs, conversations, reports, and environment files excluded from Git |
+| Public repository hygiene | Only the fictional sample corpus is committed; other source files, indexes, logs, conversations, reports, and environment files are excluded from Git |
 
 Embeddings and vector payloads remain sensitive derived data; they are not
 anonymization. Storage is local but not automatically encrypted. The MCP endpoint
@@ -478,7 +480,7 @@ O(number of chunks × vector dimensions) query cost. Qdrant supplies the dedicat
 vector-store path. Parser, backend, and embedding changes need compatible index
 state; use separate indexes when experimenting.
 
-Read the [commit history](https://github.com/rudrakshkarpe/Nerdearla-BA-privacy-first-search-lab/commits/main/)
+Read the [commit history](https://github.com/hrittikhere/Nerdearla-BA-privacy-first-search-lab/commits/main/)
 to follow architecture, parsing, retrieval, MCP, containers, sandbox configuration,
 small-model tuning, regression fixes, and rehearsal as focused changes.
 
@@ -490,7 +492,7 @@ small-model tuning, regression fixes, and rehearsal as focused changes.
 | Compose cannot find `/var/run/docker.sock` | Remove an old workshop sandbox and rerun preparation; current kits use the pinned `opencode-docker` template |
 | Docker Hub layer returns `403` | Rerun `./workshop prepare`; it temporarily permits the observed CloudFront registry redirect and removes the rule afterward |
 | OpenCode prints a tool call instead of invoking it | Rerun preparation so the sandbox installs the verified OpenCode 1.18.31 build |
-| Drive download fails | Download and extract the corpus under `data/source/`, then rerun preparation |
+| Corpus missing | Restore `data/source/dummy_loan_agreements_40/` from Git (`git checkout -- data/source`), then rerun preparation |
 | Partial/custom corpus detected | Inspect the source folder; the conductor expects the supplied 40 PDFs |
 | Port 11435 has cloud support enabled | Inspect the process occupying it; the workshop intentionally refuses that endpoint |
 | Model is slow or memory is pressured | Keep the configured demo context bounded, warm the model first, and stop unrelated heavy inference jobs |
@@ -553,9 +555,9 @@ Nerdearla-BA-privacy-first-search-lab/
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the development workflow and
 [SECURITY.md](SECURITY.md) for security scope. Keep behavioral changes focused,
 exercise meaningful failure paths, and update the verification record with actual
-execution evidence. Do not commit source documents, generated indexes, credentials,
-or harness conversations.
+execution evidence. Apart from the fictional sample corpus, do not commit source
+documents, generated indexes, credentials, or harness conversations.
 
-Repository code and documentation are [MIT licensed](LICENSE). Third-party
-documents, models, and dependencies retain their own terms. The repository license
-does not grant redistribution rights to the supplied PDFs.
+Repository code and documentation are [MIT licensed](LICENSE). The fictional
+sample PDFs are distributed with the repository for workshop use. Models and
+dependencies retain their own terms.

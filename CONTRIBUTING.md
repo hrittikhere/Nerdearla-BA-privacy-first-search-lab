@@ -16,7 +16,8 @@ Tests use synthetic values and in-memory Qdrant; they do not download the corpus
 call hosted models, or require credentials. The real-corpus acceptance check and
 OpenCode rehearsal are separate, explicit operations described in the runbook.
 
-Never commit source PDFs, vectors, model weights, `.env` files, generated reports,
+The fictional corpus in `data/source/dummy_loan_agreements_40/` is the only committed source data.
+Never commit other source PDFs, vectors, model weights, `.env` files, generated reports,
 credentials, or harness histories. Update `uv.lock` with dependency changes. Bump
 the parser identity when its output changes and document index migration/rebuild.
 Do not weaken a privacy check to turn a failed rehearsal green.

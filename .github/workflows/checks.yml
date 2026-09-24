@@ -25,8 +25,10 @@ jobs:
           python3 - <<'PY'
           import subprocess
           files = subprocess.check_output(['git', 'ls-files'], text=True).splitlines()
-          forbidden = [p for p in files if p.startswith(('.local/', 'data/index/', 'reports/'))
+          sample = 'data/source/dummy_loan_agreements_40/'
+          forbidden = [p for p in files if not p.startswith(sample) and (
+                       p.startswith(('.local/', 'data/index/', 'reports/'))
                        or (p.startswith('data/source/') and p != 'data/source/.gitkeep')
-                       or p.endswith(('.pdf', '.sqlite', '.env'))]
+                       or p.endswith(('.pdf', '.sqlite', '.env')))]
           assert not forbidden, forbidden
           PY
