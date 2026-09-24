@@ -13,6 +13,7 @@ build/
 .local/
 data/source/*
 !data/source/.gitkeep
+!data/source/dummy_loan_agreements_40/
 data/index/
 reports/
 *.log
